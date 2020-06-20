@@ -39,12 +39,12 @@
 </template>
 
 <script>
-    import Chat from './components/Chat.vue'
-    import db from "./firebase/firebaseInit";
+    import Chat from './Chat.vue'
+    import db from "../firebase/firebaseInit";
     import firebase from "firebase";
 
     export default {
-        name: 'app',
+        props: ["id"],
         components: {
             Chat
         },
