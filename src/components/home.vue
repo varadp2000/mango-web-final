@@ -1,41 +1,35 @@
 <template>
-    <div id="app">
-        <div class="content">
-            <div class="chat-container">
-                <Chat v-if="visible"
-                      :participants="participants"
-                      :myself="myself"
-                      :messages="messages"
-                      :chat-title="chatTitle"
-                      :placeholder="placeholder"
-                      :colors="colors"
-                      :border-style="borderStyle"
-                      :hide-close-button="hideCloseButton"
-                      :close-button-icon-size="closeButtonIconSize"
-                      :submit-icon-size="submitIconSize"
-                      :submit-image-icon-size="submitImageIconSize"
-                      :load-more-messages="toLoad.length > 0 ? loadMoreMessages : null"
-                      :async-mode="asyncMode"
-                      :scroll-bottom="scrollBottom"
-                      :display-header="true"
-                      :send-images="true"
-                      :profile-picture-config="profilePictureConfig"
-                      :timestamp-config="timestampConfig"
-                      @onImageClicked="onImageClicked"
-                      @onImageSelected="onImageSelected"
-                      @onMessageSubmit="onMessageSubmit"
-                      @onType="onType"
-                      @onClose="onClose('param value')">
-                    <template v-slot:header>
-                        <div>
-                            <h1 v-for="(participant, index) in participants" :key="index" class="custom-title">
-                                {{participant.name}}</h1>
-                        </div>
-                    </template>
-                </Chat>
-            </div>
-        </div>
-    </div>
+        <Chat v-if="visible"
+              :participants="participants"
+              :myself="myself"
+              :messages="messages"
+              :chat-title="chatTitle"
+              :placeholder="placeholder"
+              :colors="colors"
+              :border-style="borderStyle"
+              :hide-close-button="hideCloseButton"
+              :close-button-icon-size="closeButtonIconSize"
+              :submit-icon-size="submitIconSize"
+              :submit-image-icon-size="submitImageIconSize"
+              :load-more-messages="toLoad.length > 0 ? loadMoreMessages : null"
+              :async-mode="asyncMode"
+              :scroll-bottom="scrollBottom"
+              :display-header="true"
+              :send-images="true"
+              :profile-picture-config="profilePictureConfig"
+              :timestamp-config="timestampConfig"
+              @onImageClicked="onImageClicked"
+              @onImageSelected="onImageSelected"
+              @onMessageSubmit="onMessageSubmit"
+              @onType="onType"
+              @onClose="onClose('param value')">
+            <template v-slot:header>
+                <div>
+                    <h1 v-for="(participant, index) in participants" :key="index" class="custom-title">
+                        {{participant.name}}</h1>
+                </div>
+            </template>
+        </Chat>
 </template>
 
 <script>
@@ -44,10 +38,10 @@
     import firebase from "firebase";
 
     export default {
-        props: ["id"],
         components: {
             Chat
         },
+        props: ["id"],
         data() {
             return {
                 visible: true,
@@ -63,16 +57,7 @@
                     id: 9389857956,
                     profilePicture: 'https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg'
                 },
-                messages: [
-                    // {
-                    //     content: "Really?! I don't care! Haha",
-                    //     participantId: 1,
-                    //     timestamp: {year: 2012, month: 3, day: 5, hour: 20, minute: 10, second: 3, millisecond: 123},
-                    //     uploaded: true,
-                    //     viewed: true,
-                    //     type: 'text'
-                    // },
-                ],
+                messages: [],
                 chatTitle: 'My chat title',
                 placeholder: 'send your message',
                 colors: {
@@ -109,22 +94,7 @@
                 submitImageIconSize: 24,
                 closeButtonIconSize: "20px",
                 asyncMode: true,
-                toLoad: [
-                    // {
-                    //     content: 'Hey, John Doe! How are you today?',
-                    //     participantId: ,
-                    //     timestamp: {year: 2016, month: 3, day: 5, hour: 10, minute: 10, second: 3, millisecond: 123},
-                    //     uploaded: true,
-                    //     viewed: true
-                    // },
-                    // {
-                    //     content: "Hey, Adam! I'm feeling really fine this evening.",
-                    //     participantId: 3,
-                    //     timestamp: {year: 2016, month: 1, day: 5, hour: 19, minute: 10, second: 3, millisecond: 123},
-                    //     uploaded: true,
-                    //     viewed: true
-                    // },
-                ],
+                toLoad: [],
                 scrollBottom: {
                     messageSent: true,
                     messageReceived: false
@@ -313,23 +283,6 @@
 </script>
 
 <style>
-    #app {
-        font-family: 'Avenir', Helvetica, Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-align: center;
-        color: #2c3e50;
-        margin-top: 60px;
-    }
-
-    .content {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: space-evenly;
-        flex-wrap: wrap;
-    }
-
     .chat-container {
         display: flex;
         align-items: center;

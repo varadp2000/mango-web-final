@@ -1,184 +1,65 @@
 <template>
     <div id="app">
         <div class="content">
-            <div class="chat-container">
-                <Chat v-if="visible"
-                      :participants="participants"
-                      :myself="myself"
-                      :messages="messages"
-                      :chat-title="chatTitle"
-                      :placeholder="placeholder"
-                      :colors="colors"
-                      :border-style="borderStyle"
-                      :hide-close-button="hideCloseButton"
-                      :close-button-icon-size="closeButtonIconSize"
-                      :submit-icon-size="submitIconSize"
-                      :submit-image-icon-size="submitImageIconSize"
-                      :load-more-messages="toLoad.length > 0 ? loadMoreMessages : null"
-                      :async-mode="asyncMode"
-                      :scroll-bottom="scrollBottom"
-                      :display-header="true"
-                      :send-images="true"
-                      :profile-picture-config="profilePictureConfig"
-                      :timestamp-config="timestampConfig"
-                      @onImageClicked="onImageClicked"
-                      @onImageSelected="onImageSelected"
-                      @onMessageSubmit="onMessageSubmit"
-                      @onType="onType"
-                      @onClose="onClose('param value')">
-                    <template v-slot:header>
-                        <div>
-                            <h1 v-for="(participant, index) in participants" :key="index" class="custom-title">
-                                {{participant.name}}</h1>
+            <div style="">
+                <div style="width:20%">
+                    <div
+                            v-for="contact in contacts"
+                            :key="contact.id"
+                            class="row sideBar-body"
+                            @click="setContact(contact)"
+                    >
+                        <div class=" col-sm-3 col-xs-3 sideBar-avatar">
+                            <div class="avatar-icon">
+                                <img src="https://boygeniusreport.files.wordpress.com/2016/05/scared-surprised-cat-face.jpg?quality=98&strip=all&w=782"
+                                />
+                            </div>
                         </div>
-                    </template>
-                </Chat>
+                        <div class=" col-sm-9 col-xs-9 sideBar-main">
+                            <div class="row">
+                                <div class="col-sm-8 col-xs-8 sideBar-name">
+                                    <h1>{{contact.name}}</h1>
+                                </div>
+                                <div class="col-sm-4 col-xs-4 pull-right sideBar-time">
+                                    <span class="time-meta pull-right">15.08 </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-container">
+                    <home/>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import Chat from './components/Chat.vue'
+    import home from "./components/home";
     import db from "./firebase/firebaseInit";
-    import firebase from "firebase";
-
     export default {
         name: 'app',
         components: {
-            Chat
+            home
         },
         data() {
             return {
-                visible: true,
-                participants: [
-                    {
-                        name: 'Prabhat',
-                        id: 9003397437,
-                        profilePicture: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a1/NafSadh_Profile.jpg/768px-NafSadh_Profile.jpg'
-                    },
-                ],
-                myself: {
-                    name: 'Anmol',
-                    id: 9389857956,
-                    profilePicture: 'https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg'
-                },
-                messages: [
-                    // {
-                    //     content: "Really?! I don't care! Haha",
-                    //     participantId: 1,
-                    //     timestamp: {year: 2012, month: 3, day: 5, hour: 20, minute: 10, second: 3, millisecond: 123},
-                    //     uploaded: true,
-                    //     viewed: true,
-                    //     type: 'text'
-                    // },
-                ],
-                chatTitle: 'My chat title',
-                placeholder: 'send your message',
-                colors: {
-                    header: {
-                        bg: '#d30303',
-                        text: '#fff'
-                    },
-                    message: {
-                        myself: {
-                            bg: '#fff',
-                            text: '#525252'
-                        },
-                        others: {
-                            bg: '#fb4141',
-                            text: '#fff'
-                        },
-                        messagesDisplay: {
-                            //bg: 'rgb(247, 243, 243)',
-                            //bg: '#f7f3f3'
-                            bg: '#f7f3f3'
-                        }
-                    },
-                    submitIcon: '#b91010',
-                    submitImageIcon: '#b91010',
-                },
-                borderStyle: {
-                    topLeft: "10px",
-                    topRight: "10px",
-                    bottomLeft: "10px",
-                    bottomRight: "10px",
-                },
-                hideCloseButton: true,
-                submitIconSize: 24,
-                submitImageIconSize: 24,
-                closeButtonIconSize: "20px",
-                asyncMode: true,
-                toLoad: [
-                    // {
-                    //     content: 'Hey, John Doe! How are you today?',
-                    //     participantId: ,
-                    //     timestamp: {year: 2016, month: 3, day: 5, hour: 10, minute: 10, second: 3, millisecond: 123},
-                    //     uploaded: true,
-                    //     viewed: true
-                    // },
-                    // {
-                    //     content: "Hey, Adam! I'm feeling really fine this evening.",
-                    //     participantId: 3,
-                    //     timestamp: {year: 2016, month: 1, day: 5, hour: 19, minute: 10, second: 3, millisecond: 123},
-                    //     uploaded: true,
-                    //     viewed: true
-                    // },
-                ],
-                scrollBottom: {
-                    messageSent: true,
-                    messageReceived: false
-                },
-                profilePictureConfig: {
-                    others: true,
-                    myself: true,
-                    styles: {
-                        width: '30px',
-                        height: '30px',
-                        borderRadius: '50%'
-                    }
-                },
-                timestampConfig: {
-                    format: 'HH:mm',
-                    relative: false
-                }
+                loading: false,
+                sender: 9389857956,
+                contacts: [],
+                key: null,
             }
         },
-        watch: {
-            // async messages(val) {
-            //     this.loading = false;
-            //     try {
-            //         await db
-            //             .ref(`messages/90033974379389857956`)
-            //             .on("value", (snapshot) => (console.log(snapshot.val())));
-            //         //this.chat = this.messages.chat;
-            //     } catch (err) {
-            //         this.loading = false;
-            //     } finally {
-            //         this.loading = true;
-            //     }
-            // },
-            // async id(val) {
-            //     this.receiver = val.phone_number;
-            //     this.loading = false;
-            //     try {
-            //         await db
-            //             .ref(`messages/90033974379389857956`)
-            //             .on("value", (snapshot) => (console.log(snapshot.val())));
-            //         //this.chat = this.messages.chat;
-            //     } catch (err) {
-            //         this.loading = false;
-            //     } finally {
-            //         this.loading = true;
-            //     }
-            // },
-        },
-        async created() {
+        created: async function () {
+            this.loading = false;
             try {
                 await db
-                    .ref(`messages/90033974379389857956`)
-                    .on("value", (snapshot) => (this.cleanChat(snapshot.val())));
-                //this.chat = this.messages.chat;
+                    .ref(`contacts/${this.sender}`)
+                    .on(
+                        "value",
+                        (snapshot) => (this.createContactsArray(snapshot.val()))
+                    );
             } catch (err) {
                 this.loading = false;
             } finally {
@@ -186,133 +67,22 @@
             }
         },
         methods: {
-            cleanChat: function (firebaseJson) {
-                console.log(firebaseJson);
-                let chat = firebaseJson.chat;
-                var message = [];
-                Object.keys(chat).forEach(function (key) {
-                    let obj = {};
-                    var d = new Date(parseInt(chat[key].time_stamp));
-                    if (chat[key].type === 'document') {
-                        var fileExt = chat[key].text.split('.').pop();
-                        obj = {
-                            content: chat[key].text,
-                            participantId: parseInt(chat[key].sender_id),
-                            timestamp: {
-                                year: d.getFullYear(),
-                                month: d.getMonth() + 1,
-                                day: d.getDate(),
-                                hour: d.getHours(),
-                                minute: d.getMinutes(),
-                                second: d.getSeconds(),
-                                millisecond: d.getMilliseconds()
-                            },
-                            uploaded: true,
-                            viewed: true,
-                            preview: 'blob:' + chat[key].document_link,
-                            src: chat[key].document_link,
-                            type: 'image'
-                        };
-                    } else {
-                        obj = {
-                            content: chat[key].text,
-                            participantId: parseInt(chat[key].sender_id),
-                            timestamp: {
-                                year: d.getFullYear(),
-                                month: d.getMonth() + 1,
-                                day: d.getDate(),
-                                hour: d.getHours(),
-                                minute: d.getMinutes(),
-                                second: d.getSeconds(),
-                                millisecond: d.getMilliseconds()
-                            },
-                            uploaded: true,
-                            viewed: true,
-                            type: 'text'
-                        };
-
-                    }
-                    message.push(obj);
+            createContactsArray(firebaseJson) {
+                var contacts = [];
+                var dbContacts = firebaseJson.chatContacts;
+                Object.keys(dbContacts).forEach(function (key) {
+                    contacts.push(dbContacts[key]);
                 });
-                console.log(message);
-                this.messages = message;
+                this.contacts = contacts
             },
-            // eslint-disable-next-line
-            onType: function (e) {
-                // eslint-disable-next-line
-                console.log('typing');
+            setContact: function (key) {
+                this.key = key;
             },
-            loadMoreMessages(resolve) {
-                setTimeout(() => {
-                    resolve(this.toLoad);
-                    //Make sure the loaded messages are also added to our local messages copy or they will be lost
-                    this.messages.unshift(...this.toLoad);
-                    this.toLoad = [];
-                }, 1000);
-            },
-            onMessageSubmit(message) {
-                /*
-                * example simulating an upload callback.
-                * It's important to notice that even when your message wasn't send
-                * yet to the server you have to add the message into the array
-                */
-                this.messages.push(message);
-                var date = new Date(message.timestamp).getTime();
-                db.ref(`messages/90033974379389857956/chat`).push({
-                    is_blocked: "0",
-                    sender_id: message.participantId.toString(),
-                    text: message.content,
-                    time_stamp: date.toString(),
-                });
-                //this.message = "";
-                /*
-                * you can update message state after the server response
-                */
-                // timeout simulating the request
-                setTimeout(() => {
-                    message.uploaded = true
-                    message.viewed = true
-                }, 2000)
-            },
-            onClose(param) {
-                console.log(param)
-                this.visible = false;
-            },
-            onImageSelected({file, message}) {
-                let src = 'https://149364066.v2.pressablecdn.com/wp-content/uploads/2017/03/vue.jpg'
-                this.messages.push(message);
-                console.log(message);
-                var date = new Date(message.timestamp).getTime();
-                db.ref(`messages/90033974379389857956/chat`).push({
-                    is_blocked: "0",
-                    document_link: src,
-                    type: "document",
-                    sender_id: message.participantId.toString(),
-                    text: message.content,
-                    time_stamp: date.toString(),
-                });
-                /**
-                 * This timeout simulates a requisition that uploads the image file to the server.
-                 * It's up to you implement the request and deal with the response in order to
-                 * update the message status and the message URL
-                 */
-                setTimeout((res) => {
-                    message.uploaded = true
-                    message.src = res.src
-                }, 3000, {src});
-            },
-            onImageClicked(message) {
-                /**
-                 * This is the callback function that is going to be executed when some image is clicked.
-                 * You can add your code here to do whatever you need with the image clicked. A common situation is to display the image clicked in full screen.
-                 */
-                console.log('Image clicked', message.src)
-            }
         },
     }
 </script>
 
-<style>
+<style scoped>
     #app {
         font-family: 'Avenir', Helvetica, Arial, sans-serif;
         -webkit-font-smoothing: antialiased;
@@ -337,7 +107,90 @@
         background: rgb(247, 243, 243);
         padding: 10px 0 10px 0;
         height: 700px;
-        max-width: 80%;
+        width: 700px;
+    }
+
+    div,
+    span {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    /*#searchBox-inner input {
+      box-shadow: none;
+    }*/
+    .searchBox-inner input:focus {
+        outline: none;
+        border: none;
+        box-shadow: none;
+    }
+
+    .row {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .sideBar-body {
+        position: relative;
+        padding: 10px !important;
+        border-bottom: 1px solid #f7f7f7;
+        height: 72px;
+        margin: 0 !important;
+        cursor: pointer;
+    }
+
+    .sideBar-body:hover {
+        background-color: #f2f2f2;
+    }
+
+    .sideBar-avatar {
+        text-align: center;
+        padding: 0 !important;
+    }
+
+    .avatar-icon img {
+        border-radius: 50%;
+        height: 49px;
+        width: 49px;
+        float: left;
+    }
+
+    .sideBar-main {
+        padding: 0 !important;
+    }
+
+    .sideBar-main .row {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .sideBar-name {
+        padding: 10px !important;
+    }
+
+    .name-meta {
+        font-size: 100%;
+        padding: 1% !important;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #000000;
+    }
+
+    .sideBar-time {
+        padding: 10px !important;
+    }
+
+    .time-meta {
+        text-align: right;
+        font-size: 12px;
+        padding: 1% !important;
+        color: rgba(0, 0, 0, 0.4);
+        vertical-align: baseline;
     }
 
 </style>
