@@ -45,7 +45,7 @@
                 </v-card>
             </v-col>
             <v-col key="2">
-                <home :id="key" :participant-config="participant"/>
+                <home :id="key" :participant-config="participant" :show-chat="showChat"/>
             </v-col>
         </v-row>
     </v-container>
@@ -63,6 +63,7 @@
             loading: false,
             sender: 9389857956,
             key: '',
+            showChat: false,
             participant: {},
         }),
         created: async function () {
@@ -100,12 +101,11 @@
                 this.contacts = contacts
             },
             async getProfilePicture(contactNumber) {
-                var url = '';
+                var url = 'https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg';
                 try {
                     await db
                         .ref(`contacts/${contactNumber}`)
-                        .on(
-                            "value",
+                        .on("value",
                             (snapshot) => (url = this.saveProfilePicture(snapshot.val().profile_url)))
                 } catch (err) {
                     this.loading = false;
@@ -117,7 +117,6 @@
             saveProfilePicture(url) {
                 if (url === undefined) {
                     return 'https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg';
-
                 } else {
                     return url;
                 }
@@ -130,6 +129,7 @@
                     profilePicture: this.contacts[index].avatar,
                 };
                 this.key = key;
+                this.showChat = true;
             },
         },
     }

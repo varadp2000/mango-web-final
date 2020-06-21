@@ -64,17 +64,18 @@
                 type: Object,
                 required: true,
             },
+            showChat: {
+                type: Boolean,
+                required: false,
+                default: () => {
+                    return false
+                }
+            }
         },
         data() {
             return {
-                visible: true,
-                participants: [
-                    {
-                        name: 'Prabhat',
-                        id: 9003397437,
-                        profilePicture: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a1/NafSadh_Profile.jpg/768px-NafSadh_Profile.jpg'
-                    },
-                ],
+                visible: this.showChat,
+                participants: [],
                 myself: {
                     name: 'Anmol',
                     id: 9389857956,
@@ -138,6 +139,29 @@
             }
         },
         watch: {
+            showChat: function (newVal, oldVal) {
+                console.log(newVal);
+                this.visible = newVal
+            },
+            participantConfig: function (newVal, oldVal) {
+                var tempArray = [];
+                tempArray.push(newVal);
+                this.participants = tempArray;
+                console.log('Prop changed: ', newVal, ' | was: ', oldVal)
+            },
+            id: async function (newVal, oldVal) {
+                this.id = newVal;
+                try {
+                    await db
+                        .ref(`messages/${newVal}`)
+                        .on("value", (snapshot) => (this.cleanChat(snapshot.val())));
+                    //this.chat = this.messages.chat;
+                } catch (err) {
+                    this.loading = false;
+                } finally {
+                    this.loading = true;
+                }
+            }
             // async messages(val) {
             //     this.loading = false;
             //     try {
@@ -167,16 +191,7 @@
             // },
         },
         async created() {
-            try {
-                await db
-                    .ref(`messages/90033974379389857956`)
-                    .on("value", (snapshot) => (this.cleanChat(snapshot.val())));
-                //this.chat = this.messages.chat;
-            } catch (err) {
-                this.loading = false;
-            } finally {
-                this.loading = true;
-            }
+
         },
         methods: {
             cleanChat: function (firebaseJson) {
@@ -250,21 +265,21 @@
                 * yet to the server you have to add the message into the array
                 */
                 this.messages.push(message);
-                var text = message.content;
-                text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
-                var date = new Date(message.timestamp).getTime();
-                db.ref(`messages/90033974379389857956/chat`).push({
-                    is_blocked: "0",
-                    sender_id: message.participantId.toString(),
-                    text: text,
-                    time_stamp: date.toString(),
-                });
                 //this.message = "";
                 /*
                 * you can update message state after the server response
                 */
                 // timeout simulating the request
                 setTimeout(() => {
+                    var text = message.content;
+                    text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
+                    var date = new Date(message.timestamp).getTime();
+                    db.ref(`messages/${this.id}/chat`).push({
+                        is_blocked: "0",
+                        sender_id: message.participantId.toString(),
+                        text: text,
+                        time_stamp: date.toString(),
+                    });
                     message.uploaded = true
                     message.viewed = true
                 }, 2000)
@@ -274,27 +289,31 @@
                 this.visible = false;
             },
             onImageSelected({file, message}) {
-                let src = 'https://149364066.v2.pressablecdn.com/wp-content/uploads/2017/03/vue.jpg'
+                let uploadValue;
                 this.messages.push(message);
-                console.log(message);
-                var date = new Date(message.timestamp).getTime();
-                db.ref(`messages/90033974379389857956/chat`).push({
-                    is_blocked: "0",
-                    document_link: src,
-                    type: "document",
-                    sender_id: message.participantId.toString(),
-                    text: message.content,
-                    time_stamp: date.toString(),
-                });
+                const storageRef=firebase.storage().ref(`${file.name}`).put(file);
+                storageRef.on(`state_changed`,snapshot=>{
+                        uploadValue = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
+                    }, error=>{console.log(error.message)},
+                    ()=>{uploadValue=100;
+                        storageRef.snapshot.ref.getDownloadURL().then((url)=>{
+                            var date = new Date(message.timestamp).getTime();
+                            db.ref(`messages/${this.id}/chat`).push({
+                                is_blocked: "0",
+                                document_link:url,
+                                type: "document",
+                                sender_id: message.participantId.toString(),
+                                text: file.name,
+                                time_stamp: date.toString(),
+                            });
+                        });
+                    }
+                );
                 /**
                  * This timeout simulates a requisition that uploads the image file to the server.
                  * It's up to you implement the request and deal with the response in order to
                  * update the message status and the message URL
                  */
-                setTimeout((res) => {
-                    message.uploaded = true
-                    message.src = res.src
-                }, 3000, {src});
             },
             onImageClicked(message) {
                 /**
