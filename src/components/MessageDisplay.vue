@@ -10,7 +10,7 @@
                        :profile-picture-config="profilePictureConfig"
                        :timestamp-config="timestampConfig"
                        @onImageClicked="onImageClicked"/>
-            <OtherMessage v-else :message="message" :async-mode="asyncMode" 
+            <OtherMessage v-else :message="message" :async-mode="asyncMode"
                           :colors="colors"
                           :profile-picture-config="profilePictureConfig"
                           :timestamp-config="timestampConfig"
@@ -82,7 +82,7 @@
         },
         updated() {
             if (this.messages.length && !this.messageCompare(this.messages[this.messages.length - 1], this.lastMessage)) {
-                
+
                 if(this.updateScroll || (this.scrollBottom.messageSent && this.messages[this.messages.length - 1].participantId == this.myself.id) || (this.scrollBottom.messageReceived && this.messages[this.messages.length - 1].participantId != this.myself.id)){
                     this.goToBottom();
                     if (this.messages.length) {
@@ -98,7 +98,7 @@
             /**
              * This function compare two messages without looking at the uploaded propertie.
              * This function has been implemented to prevent chat scrolling down after changing the message from 'uploaded = false' to 'uploaded = true'.
-             * @param {Object} message1 the first message object 
+             * @param {Object} message1 the first message object
              * @param {Object} message2 the second message object
              * @return {Boolean} true if the messages are equal and false if they are different
              */
@@ -125,9 +125,9 @@
                     this.loading = true;
                     this.loadMoreMessages((messages) => {
                         //if (Array.isArray(messages) && messages.length > 0) {
-                            /** 
+                            /**
                              * this code will be removed before the next release
-                             * 
+                             *
                              * this line is commented because the setMessages is already called
                              * when 'this.messages.unshift(...this.toLoad)' is executed at App.vue line 177
                              * it was executing the same function twice, causing unexpected behavior with Luxon date objects
@@ -167,7 +167,7 @@
             .message-container{
                 display:-webkit-box !important;
             }
-            
+
         }}
 
         .message-image{
@@ -268,7 +268,7 @@
             animation: spin 1.0s ease infinite;
             position: absolute;
         }
-        
+
         .img-overlay{
             opacity: 0.4;
         }

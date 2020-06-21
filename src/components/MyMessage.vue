@@ -11,21 +11,29 @@
                     <div class="img-loading"></div>
                 </div>
             </template>
-            <template v-else>    
-                <div class="message-text" :style="{background: colors.message.myself.bg, color: colors.message.myself.text}">
+            <template v-else>
+                <div class="message-text"
+                     :style="{background: colors.message.myself.bg, color: colors.message.myself.text}">
                     <p class="message-username">{{myself.name}}</p>
-                    <p>{{message.content}}</p>
+                    <span>{{message.content}}
+                        <v-btn v-if="message.src" text
+                               icon color="red lighten-2"
+                               :href="message.src" target="_blank">
+                            <v-icon>mdi-download-circle-outline</v-icon>
+                        </v-btn>
+                    </span>
                 </div>
             </template>
             <div class="message-timestamp" :style="{'justify-content': 'flex-end'}">
                 <template v-if="timestampConfig.relative">
                     {{message.timestamp.toRelative()}}
                 </template>
-                <template v-else> 
+                <template v-else>
                     {{message.timestamp.toFormat(timestampConfig.format)}}
                 </template>
                 <CheckIcon v-if="asyncMode && message.uploaded && !message.viewed" :size="14" class="icon-sent"/>
-                <CheckAll v-else-if="asyncMode && message.uploaded && message.viewed" :size="14" class="icon-sent viewed"/>
+                <CheckAll v-else-if="asyncMode && message.uploaded && message.viewed" :size="14"
+                          class="icon-sent viewed"/>
                 <div v-else-if="asyncMode" class="message-loading"></div>
             </div>
         </div>
@@ -40,12 +48,13 @@
     import CheckIcon from 'vue-material-design-icons/Check';
     import CheckAll from 'vue-material-design-icons/CheckAll';
     import {mapGetters, mapMutations} from 'vuex';
+
     export default {
-        components:{
+        components: {
             CheckIcon,
             CheckAll,
         },
-        props:{
+        props: {
             message: {
                 type: Object,
                 required: true
@@ -81,7 +90,7 @@
             ]),
         },
         methods: {
-            onImageClicked: function(message){
+            onImageClicked: function (message) {
                 this.$emit("onImageClicked", message)
             }
         }
@@ -89,21 +98,21 @@
 </script>
 
 <style lang="less">
-    .container-message-display .myself-message-body{
+    .container-message-display .myself-message-body {
         display: flex;
         align-items: flex-end;
         padding-right: 10px;
         justify-content: flex-end;
 
 
-        .message-content{
+        .message-content {
             display: flex;
             align-items: flex-end;
             justify-content: flex-start;
             flex-direction: column;
         }
 
-        .participant-thumb{
+        .participant-thumb {
             width: 25px;
             height: 25px;
             border-radius: 50%;
@@ -128,13 +137,12 @@
             background: #fff;
             padding: 6px 10px;
             line-height: 14px;
-            border-radius: 15px;
             margin: 5px 0 5px 0;
             max-width: 70%;
             overflow-wrap: break-word;
             text-align: left;
             white-space: pre-wrap;
-            border-bottom-right-radius: 0px;
+            border-radius: 15px 15px 0px 15px;
             word-break: break-word;
         }
     }

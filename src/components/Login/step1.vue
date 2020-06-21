@@ -1,15 +1,15 @@
 <template>
-  <div style="text-align:center">
-      <img src="https://www.w3schools.com/howto/img_avatar.png"  style="border-radius:100%;max-width:300px">
-      <vue-tel-input v-model="phone" /><br/>
-  </div>
+    <div style="text-align:center">
+        <img src="https://www.w3schools.com/howto/img_avatar.png" style="border-radius:100%;max-width:300px">
+        <vue-tel-input v-model="phone"/><br>
+    </div>
 </template>
 
 <script>
 export default {
   data: function() {
     return {
-      phone: 0,
+      phone: '',
     };
   },
   methods: {

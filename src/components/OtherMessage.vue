@@ -18,14 +18,20 @@
             <template v-else>
                 <div class="message-text" :style="{background: colors.message.others.bg, color: colors.message.others.text}">
                     <p class="message-username">{{getParticipantById(message.participantId).name}}</p>
-                    <p>{{message.content}}</p>
+                    <span>{{message.content}}
+                        <v-btn v-if="message.src" text
+                               icon color="white lighten-2"
+                               :href="message.src" target="_blank">
+                            <v-icon>mdi-download-circle-outline</v-icon>
+                        </v-btn>
+                    </span>
                 </div>
             </template>
             <div class="message-timestamp" :style="{'justify-content': 'baseline'}">
                 <template v-if="timestampConfig.relative">
                     {{message.timestamp.toRelative()}}
                 </template>
-                <template v-else> 
+                <template v-else>
                     {{message.timestamp.toFormat(timestampConfig.format)}}
                 </template>
                 <CheckIcon v-if="asyncMode && message.uploaded && !message.viewed" :size="14" class="icon-sent"/>
@@ -126,13 +132,12 @@
             background: #fff;
             padding: 6px 10px;
             line-height: 14px;
-            border-radius: 15px;
             margin: 5px 0 5px 0;
             max-width: 70%;
             overflow-wrap: break-word;
             text-align: left;
             white-space: pre-wrap;
-            border-bottom-left-radius: 0px;
+            border-radius: 15px 15px 15px 0px;
             word-break: break-word;
         }
     }

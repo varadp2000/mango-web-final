@@ -1,163 +1,165 @@
 <template>
-  <v-container class="grey lighten-5">
-    <div style="display:flex">
-      <div style="width:20%">
-        <v-toolbar color="deep-purple accent-4" dark>
-          <v-app-bar-nav-icon />
+    <v-container class="grey lighten-5">
+        <div style="display:flex">
+            <div style="width:40%;">
+                <v-toolbar color="#d30303" dark>
+                    <v-app-bar-nav-icon/>
 
-          <v-toolbar-title>New Chat</v-toolbar-title>
+                    <v-toolbar-title>New Chat</v-toolbar-title>
 
-          <v-spacer />
-          <v-btn @click="status = true" text>
-            Status
-          </v-btn>
-          <v-btn icon>
-            <v-icon>mdi-magnify</v-icon>
-          </v-btn>
-        </v-toolbar>
-        <v-list subheader>
-          <v-subheader>Recent chat</v-subheader>
+                    <v-spacer/>
+                    <v-btn text @click="status = true">
+                        Status
+                    </v-btn>
+                    <v-btn icon>
+                        <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                </v-toolbar>
+                <v-list subheader>
+                    <v-subheader>Recent chat</v-subheader>
 
-          <v-list-item
-            v-for="(item, index) in contacts"
-            :key="item.key"
-            @click="setContact(item.key, index)"
-          >
-            <v-list-item-avatar>
-              <v-img :src="item.avatar" />
-            </v-list-item-avatar>
+                    <v-list-item
+                        v-for="(item, index) in contacts"
+                        :key="item.key"
+                        @click="setContact(item.key, index)">
+                        <v-list-item-avatar>
+                            <v-img :src="item.avatar"/>
+                        </v-list-item-avatar>
 
-            <v-list-item-content>
-              <v-list-item-title v-text="item.name" />
-              <v-list-item-subtitle v-text="item.lastMessage" />
-            </v-list-item-content>
+                        <v-list-item-content>
+                            <v-list-item-title v-text="item.name"/>
+                            <v-list-item-subtitle>{{item.lastMessage}}</v-list-item-subtitle>
+                        </v-list-item-content>
 
-            <v-list-item-icon>
-              <span>{{ item.time }}</span>
-            </v-list-item-icon>
-          </v-list-item>
-        </v-list>
-      </div>
-      <div style="width:80%">
-        <home
-          :id="key"
-          :participant-config="participant"
-          :show-chat="showChat"
-        />
-      </div>
-    </div>
-    <v-dialog fullscreen transition="dialog-bottom-transition" v-model="status">
-      <v-card>
-        <v-row>
-          <v-spacer /><v-btn @click="status = false" text>X</v-btn>
-        </v-row>
-        <status />
-      </v-card>
-    </v-dialog>
-  </v-container>
+                        <v-list-item-icon>
+                            <span>{{new Date(parseInt(item.time)).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}}</span>
+                        </v-list-item-icon>
+                    </v-list-item>
+                </v-list>
+            </div>
+            <div style="width:100%">
+                <home
+                    :id="key"
+                    :participant-config="participant"
+                    :show-chat="showChat"/>
+            </div>
+        </div>
+        <v-dialog v-model="status" fullscreen transition="dialog-bottom-transition">
+            <v-card>
+                <v-row>
+                    <v-spacer/>
+                    <v-btn text @click="status = false">X</v-btn>
+                </v-row>
+                <status/>
+            </v-card>
+        </v-dialog>
+    </v-container>
 </template>
 <script>
-import db from "../firebase/firebaseInit";
-import home from "./home";
-import status from "./status";
-export default {
-  components: {
-    home,
-    status,
-  },
-  data: () => ({
-    contacts: [],
-    loading: false,
-    sender: 9389857956,
-    key: "",
-    showChat: false,
-    participant: {},
-    status: false,
-  }),
-  watch: {
-    async contacts(val) {
-      this.loading = false;
-      try {
-        await db
-          .ref(`contacts/${val}`)
-          .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
-      } catch (err) {
-        this.loading = false;
-      } finally {
-        this.loading = true;
-      }
-    },
-  },
-  created: async function() {
-    this.loading = false;
-    try {
-      await db
-        .ref(`contacts/${this.sender}`)
-        .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
-    } catch (err) {
-      this.loading = false;
-    } finally {
-      this.loading = true;
+    import db from "../firebase/firebaseInit";
+    import home from "./home";
+    import status from "./status";
+
+    export default {
+        components: {
+            home,
+            status,
+        },
+        data: () => ({
+            contacts: [],
+            loading: false,
+            sender: 9389857956,
+            key: "",
+            showChat: false,
+            participant: {},
+            status: false,
+        }),
+        watch: {
+            async contacts(val) {
+                try {
+                    await db
+                        .ref(`contacts/${val}`)
+                        .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
+                } catch (err) {
+                    this.loading = false;
+                } finally {
+                    this.loading = true;
+                }
+            },
+        },
+        created: async function () {
+            this.loading = false;
+            try {
+                await db
+                    .ref(`contacts/${this.sender}`)
+                    .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
+            } catch (err) {
+                this.loading = false;
+            } finally {
+                this.loading = true;
+            }
+        },
+        methods: {
+            async createContactsArray(firebaseJson) {
+                var contacts = [];
+                var dbContacts = firebaseJson.chatContacts;
+                for (const key of Object.keys(dbContacts)) {
+                    var profileUrl = await this.getProfilePicture(
+                        dbContacts[key].phone_number
+                    );
+                    var lastMessage = await this.getLastMessage(dbContacts[key].key);
+                    var getLastTime = await this.getLastTimeStamp(dbContacts[key].key);
+                    var obj = {
+                        active: true,
+                        name: dbContacts[key].name,
+                        lastMessage: lastMessage,
+                        time: getLastTime,
+                        key: dbContacts[key].key,
+                        avatar: profileUrl,
+                        phoneNumber: dbContacts[key].phone_number,
+                    };
+                    contacts.push(obj);
+                }
+                contacts.sort((a, b) => (a.time < b.time) ? 1 : -1)
+                this.contacts = contacts;
+            },
+            getLastMessage(key) {
+                var lastMessage_key = this.sender + "_last_message";
+                console.log(lastMessage_key);
+                return db.ref(`messages/${key}/${lastMessage_key}`).once('value').then(function (snapshot) {
+                    console.log(snapshot.val());
+                    return snapshot.val();
+                });
+            },
+            getProfilePicture(contactNumber) {
+                return db.ref(`contacts/${contactNumber}`).once('value').then(function (snapshot) {
+                    if (snapshot.val().profile_url === undefined) {
+                        return "https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg";
+                    } else {
+                        return snapshot.val().profile_url;
+                    }
+                });
+            },
+            getLastTimeStamp(key) {
+                var lastMessage_key = this.sender + "_last_time_stamp";
+                console.log(lastMessage_key);
+                return db.ref(`messages/${key}/${lastMessage_key}`).once('value').then(function (snapshot) {
+                    console.log(snapshot.val());
+                    return snapshot.val();
+                });
+            },
+            setContact: function (key, index) {
+                this.participant = {
+                    name: this.contacts[index].name,
+                    id: parseInt(this.contacts[index].phoneNumber),
+                    profilePicture: this.contacts[index].avatar,
+                };
+                this.key = key;
+                this.showChat = true;
+            },
+            formatTime(){
+            },
+        },
     }
-  },
-  methods: {
-    async createContactsArray(firebaseJson) {
-      var contacts = [];
-      var dbContacts = firebaseJson.chatContacts;
-      for (const key of Object.keys(dbContacts)) {
-        var profileUrl = await this.getProfilePicture(
-          dbContacts[key].phone_number
-        );
-        var obj = {
-          active: true,
-          name: dbContacts[key].name,
-          lastMessage: "Last Message Here",
-          time: "09:23",
-          key: dbContacts[key].key,
-          avatar: profileUrl,
-          phoneNumber: dbContacts[key].phone_number,
-        };
-        contacts.push(obj);
-      }
-      this.contacts = contacts;
-    },
-    async getProfilePicture(contactNumber) {
-      var url =
-        "https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg";
-      try {
-        await db
-          .ref(`contacts/${contactNumber}`)
-          .on(
-            "value",
-            (snapshot) =>
-              (url = this.saveProfilePicture(snapshot.val().profile_url))
-          );
-      } catch (err) {
-        console.log(err);
-        this.loading = false;
-      } finally {
-        this.loading = true;
-      }
-      return url;
-    },
-    saveProfilePicture(url) {
-      if (url === undefined) {
-        return "https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg";
-      } else {
-        return url;
-      }
-    },
-    setContact: function(key, index) {
-      console.log(this.contacts[index]);
-      this.participant = {
-        name: this.contacts[index].name,
-        id: parseInt(this.contacts[index].phoneNumber),
-        profilePicture: this.contacts[index].avatar,
-      };
-      this.key = key;
-      this.showChat = true;
-    },
-  },
-};
 </script>
 <style scoped></style>

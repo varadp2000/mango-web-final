@@ -1,20 +1,19 @@
 <template>
-  <div>
-    <v-container style="text-align:center">
-      <input
-        type="text"
-        id="partitioned"
-        class="form-control"
-        placeholder="0"
-        maxlength="6"
-      />
-    </v-container>
-    <br />
-  </div>
+    <div>
+        <v-container style="text-align:center">
+            <input
+                id="partitioned"
+                type="text"
+                class="form-control"
+                placeholder="0"
+                maxlength="6">
+        </v-container>
+        <br>
+    </div>
 </template>
 <script>
 export default {
-  name: "App",
+  name: "app",
 
   methods: {
     handleOnComplete(value) {

@@ -108,9 +108,9 @@
                     submitImageIcon: '#b91010',
                 },
                 borderStyle: {
-                    topLeft: "10px",
+                    topLeft: "0px",
                     topRight: "10px",
-                    bottomLeft: "10px",
+                    bottomLeft: "0px",
                     bottomRight: "10px",
                 },
                 hideCloseButton: true,
@@ -202,7 +202,12 @@
                     let obj = {};
                     var d = new Date(parseInt(chat[key].time_stamp));
                     if (chat[key].type === 'document') {
+                        let type = "image"
+                        let imageExtension = ["jpg", "jpeg", "bmp", "gif", "png"];
                         var fileExt = chat[key].text.split('.').pop();
+                        if (!imageExtension.includes(/[^.]+$/.exec(fileExt)[0])) {
+                            type = "other"
+                        }
                         obj = {
                             content: chat[key].text,
                             participantId: parseInt(chat[key].sender_id),
@@ -219,7 +224,7 @@
                             viewed: true,
                             preview: 'blob:' + chat[key].document_link,
                             src: chat[key].document_link,
-                            type: 'image'
+                            type: type
                         };
                     } else {
                         obj = {
@@ -270,19 +275,33 @@
                 * you can update message state after the server response
                 */
                 // timeout simulating the request
+                var text = message.content;
+                var date = date = new Date(message.timestamp).getTime();
                 setTimeout(() => {
-                    var text = message.content;
                     text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
-                    var date = new Date(message.timestamp).getTime();
                     db.ref(`messages/${this.id}/chat`).push({
                         is_blocked: "0",
                         sender_id: message.participantId.toString(),
                         text: text,
                         time_stamp: date.toString(),
                     });
-                    message.uploaded = true
-                    message.viewed = true
-                }, 2000)
+                    message.uploaded = true;
+                    message.viewed = true;
+                    let senderKey_lastMessage = message.participantId + "_last_message";
+                    let senderKey_lastTimeStamp = message.participantId + "_last_time_stamp";
+                    let receiverKey_lastMessage = this.participants[0].id + "_last_message";
+                    let receiverKey_lastTimeStamp = this.participants[0].id + "_last_time_stamp";
+                    var obj = {
+                        [senderKey_lastMessage]: text,
+                        [senderKey_lastTimeStamp]: date.toString(),
+                        [receiverKey_lastMessage]: text,
+                        [receiverKey_lastTimeStamp]: date.toString(),
+                    };
+                    this.updateLastSettings(obj);
+                }, 2000);
+            },
+            updateLastSettings(object) {
+                db.ref(`messages/${this.id}`).update(object);
             },
             onClose(param) {
                 console.log(param)
@@ -291,16 +310,19 @@
             onImageSelected({file, message}) {
                 let uploadValue;
                 this.messages.push(message);
-                const storageRef=firebase.storage().ref(`${file.name}`).put(file);
-                storageRef.on(`state_changed`,snapshot=>{
-                        uploadValue = (snapshot.bytesTransferred/snapshot.totalBytes)*100;
-                    }, error=>{console.log(error.message)},
-                    ()=>{uploadValue=100;
-                        storageRef.snapshot.ref.getDownloadURL().then((url)=>{
+                const storageRef = firebase.storage().ref(`${file.name}`).put(file);
+                storageRef.on(`state_changed`, snapshot => {
+                        uploadValue = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    }, error => {
+                        console.log(error.message)
+                    },
+                    () => {
+                        uploadValue = 100;
+                        storageRef.snapshot.ref.getDownloadURL().then((url) => {
                             var date = new Date(message.timestamp).getTime();
                             db.ref(`messages/${this.id}/chat`).push({
                                 is_blocked: "0",
-                                document_link:url,
+                                document_link: url,
                                 type: "document",
                                 sender_id: message.participantId.toString(),
                                 text: file.name,
@@ -332,9 +354,8 @@
         align-items: center;
         justify-content: center;
         background: rgb(247, 243, 243);
-        padding: 10px 0 10px 0;
         height: 700px;
-        max-width: 80%;
+        max-width: 100%;
     }
 
 </style>
