@@ -1,35 +1,37 @@
 <template>
-        <Chat v-if="visible"
-              :participants="participants"
-              :myself="myself"
-              :messages="messages"
-              :chat-title="chatTitle"
-              :placeholder="placeholder"
-              :colors="colors"
-              :border-style="borderStyle"
-              :hide-close-button="hideCloseButton"
-              :close-button-icon-size="closeButtonIconSize"
-              :submit-icon-size="submitIconSize"
-              :submit-image-icon-size="submitImageIconSize"
-              :load-more-messages="toLoad.length > 0 ? loadMoreMessages : null"
-              :async-mode="asyncMode"
-              :scroll-bottom="scrollBottom"
-              :display-header="true"
-              :send-images="true"
-              :profile-picture-config="profilePictureConfig"
-              :timestamp-config="timestampConfig"
-              @onImageClicked="onImageClicked"
-              @onImageSelected="onImageSelected"
-              @onMessageSubmit="onMessageSubmit"
-              @onType="onType"
-              @onClose="onClose('param value')">
-            <template v-slot:header>
-                <div>
-                    <h1 v-for="(participant, index) in participants" :key="index" class="custom-title">
-                        {{participant.name}}</h1>
-                </div>
-            </template>
-        </Chat>
+
+    <Chat v-if="visible"
+          :participants="participants"
+          :myself="myself"
+          :messages="messages"
+          :chat-title="chatTitle"
+          :placeholder="placeholder"
+          :colors="colors"
+          :border-style="borderStyle"
+          :hide-close-button="hideCloseButton"
+          :close-button-icon-size="closeButtonIconSize"
+          :submit-icon-size="submitIconSize"
+          :submit-image-icon-size="submitImageIconSize"
+          :load-more-messages="toLoad.length > 0 ? loadMoreMessages : null"
+          :async-mode="asyncMode"
+          :scroll-bottom="scrollBottom"
+          :display-header="true"
+          :send-images="true"
+          :profile-picture-config="profilePictureConfig"
+          :timestamp-config="timestampConfig"
+          @onImageClicked="onImageClicked"
+          @onImageSelected="onImageSelected"
+          @onMessageSubmit="onMessageSubmit"
+          @onType="onType"
+          @onClose="onClose('param value')">
+        <template v-slot:header>
+            <div>
+                <h1 v-for="(participant, index) in participants" :key="index" class="custom-title">
+                    {{participant.name}}
+                </h1>
+            </div>
+        </template>
+    </Chat>
 </template>
 
 <script>
