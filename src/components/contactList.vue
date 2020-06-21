@@ -24,23 +24,20 @@
                         <v-subheader>Recent chat</v-subheader>
 
                         <v-list-item
-                                v-for="item in contacts"
+                                v-for="(item, index) in contacts"
                                 :key="item.key"
-                                @click="setContact(item.key)"
-                        >
+                                @click="setContact(item.key, index)">
                             <v-list-item-avatar>
                                 <v-img :src="item.avatar"/>
                             </v-list-item-avatar>
 
                             <v-list-item-content>
-                                <v-list-item-title v-text="item.title"/>
+                                <v-list-item-title v-text="item.name"/>
                                 <v-list-item-subtitle v-text="item.lastMessage"/>
                             </v-list-item-content>
 
                             <v-list-item-icon>
-                                <v-badge
-                                        color="green"
-                                        content="6"/>
+                                <span>{{item.time}}</span>
                             </v-list-item-icon>
                         </v-list-item>
                     </v-list>
@@ -48,7 +45,7 @@
                 </v-card>
             </v-col>
             <v-col key="2">
-                <home :id="key"/>
+                <home :id="key" :participant-config="participant"/>
             </v-col>
         </v-row>
     </v-container>
@@ -65,7 +62,8 @@
             contacts: [],
             loading: false,
             sender: 9389857956,
-            key: null,
+            key: '',
+            participant: {},
         }),
         created: async function () {
             this.loading = false;
@@ -90,24 +88,25 @@
                     var profileUrl = await this.getProfilePicture(dbContacts[key].phone_number);
                     var obj = {
                         active: true,
-                        title: dbContacts[key].name,
+                        name: dbContacts[key].name,
                         lastMessage: 'Last Message Here',
                         time: '09:23',
                         key: dbContacts[key].key,
-                        avatar: profileUrl
+                        avatar: profileUrl,
+                        phoneNumber: dbContacts[key].phone_number,
                     };
                     contacts.push(obj);
                 }
                 this.contacts = contacts
             },
             async getProfilePicture(contactNumber) {
-                var url ='';
+                var url = '';
                 try {
                     await db
                         .ref(`contacts/${contactNumber}`)
                         .on(
                             "value",
-                            (snapshot) => (url = this.saveProfilePicture(snapshot.val().profile_url))                )
+                            (snapshot) => (url = this.saveProfilePicture(snapshot.val().profile_url)))
                 } catch (err) {
                     this.loading = false;
                 } finally {
@@ -123,8 +122,13 @@
                     return url;
                 }
             },
-            setContact: function (key) {
-                console.log(key);
+            setContact: function (key, index) {
+                console.log(this.contacts[index]);
+                this.participant = {
+                    name: this.contacts[index].name,
+                    id: parseInt(this.contacts[index].phoneNumber),
+                    profilePicture: this.contacts[index].avatar,
+                };
                 this.key = key;
             },
         },

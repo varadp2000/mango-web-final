@@ -1,37 +1,49 @@
 <template>
+    <div class="chat-container">
+        <Chat v-if="visible"
+              :participants="participants"
+              :myself="myself"
+              :messages="messages"
+              :chat-title="chatTitle"
+              :placeholder="placeholder"
+              :colors="colors"
+              :border-style="borderStyle"
+              :hide-close-button="hideCloseButton"
+              :close-button-icon-size="closeButtonIconSize"
+              :submit-icon-size="submitIconSize"
+              :submit-image-icon-size="submitImageIconSize"
+              :load-more-messages="toLoad.length > 0 ? loadMoreMessages : null"
+              :async-mode="asyncMode"
+              :scroll-bottom="scrollBottom"
+              :display-header="true"
+              :send-images="true"
+              :profile-picture-config="profilePictureConfig"
+              :timestamp-config="timestampConfig"
+              @onImageClicked="onImageClicked"
+              @onImageSelected="onImageSelected"
+              @onMessageSubmit="onMessageSubmit"
+              @onType="onType"
+              @onClose="onClose('param value')">
+            <template v-slot:header>
+                <div>
+                    <v-list style="background-color: #d30303">
+                        <v-list-item v-for="(participant, index) in participants" :key="index" class="custom-title">
+                            <v-list-item-avatar>
+                                <v-img :src="participant.profilePicture"/>
+                            </v-list-item-avatar>
 
-    <Chat v-if="visible"
-          :participants="participants"
-          :myself="myself"
-          :messages="messages"
-          :chat-title="chatTitle"
-          :placeholder="placeholder"
-          :colors="colors"
-          :border-style="borderStyle"
-          :hide-close-button="hideCloseButton"
-          :close-button-icon-size="closeButtonIconSize"
-          :submit-icon-size="submitIconSize"
-          :submit-image-icon-size="submitImageIconSize"
-          :load-more-messages="toLoad.length > 0 ? loadMoreMessages : null"
-          :async-mode="asyncMode"
-          :scroll-bottom="scrollBottom"
-          :display-header="true"
-          :send-images="true"
-          :profile-picture-config="profilePictureConfig"
-          :timestamp-config="timestampConfig"
-          @onImageClicked="onImageClicked"
-          @onImageSelected="onImageSelected"
-          @onMessageSubmit="onMessageSubmit"
-          @onType="onType"
-          @onClose="onClose('param value')">
-        <template v-slot:header>
-            <div>
-                <h1 v-for="(participant, index) in participants" :key="index" class="custom-title">
-                    {{participant.name}}
-                </h1>
-            </div>
-        </template>
-    </Chat>
+                            <v-list-item-content>
+                                <v-list-item-title class="white--text font-weight-black" v-text="participant.name"/>
+                            </v-list-item-content>
+
+                            <!--                            <v-list-item-icon>-->
+                            <!--                            </v-list-item-icon>-->
+                        </v-list-item>
+                    </v-list>
+                </div>
+            </template>
+        </Chat>
+    </div>
 </template>
 
 <script>
@@ -43,7 +55,16 @@
         components: {
             Chat
         },
-        props: ["id"],
+        props: {
+            id: {
+                type: String,
+                required: true,
+            },
+            participantConfig: {
+                type: Object,
+                required: true,
+            },
+        },
         data() {
             return {
                 visible: true,
@@ -229,11 +250,13 @@
                 * yet to the server you have to add the message into the array
                 */
                 this.messages.push(message);
+                var text = message.content;
+                text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
                 var date = new Date(message.timestamp).getTime();
                 db.ref(`messages/90033974379389857956/chat`).push({
                     is_blocked: "0",
                     sender_id: message.participantId.toString(),
-                    text: message.content,
+                    text: text,
                     time_stamp: date.toString(),
                 });
                 //this.message = "";
