@@ -11,7 +11,10 @@ export default () => {
             myself: {},
             participants: [],
             chatTitle: '',
-            placeholder: ''
+            placeholder: '',
+            token: localStorage.getItem('auth_token') || null,
+            isAuthenticated: localStorage.getItem('isAuthenticated') || false,
+            phoneNumber: localStorage.getItem('phone') || null,
         },
         mutations: {
             newMessage: (state, message) => {
@@ -40,7 +43,17 @@ export default () => {
             },
             setPlaceholder: (state, placeholder) => {
                 state.placeholder = placeholder;
-            }
+            },
+            setAuthToken:(state, payload)=> {
+                localStorage.setItem('auth_token', payload.token);
+                localStorage.setItem('isAuthenticated', 'true');
+                state.token = payload.token;
+                state.isAuthenticated = true;
+            },
+            setPhoneNumber:(state, phone)=>{
+                localStorage.setItem('phone', phone);
+                state.phoneNumber = phone;
+            },
         },
         actions: {},
         getters: {
@@ -65,7 +78,13 @@ export default () => {
             },
             myself: (state) => {
                 return state.myself;
-            }
+            },
+            getAuthStatus: (state) => {
+                return state.isAuthenticated;
+            },
+            getPhoneNumber: (state) => {
+                return state.phoneNumber;
+            },
         }
     })
 }

@@ -50,6 +50,7 @@
     import Chat from './Chat.vue'
     import db from "../firebase/firebaseInit";
     import firebase from "firebase";
+    import {mapGetters} from "vuex";
 
     export default {
         components: {
@@ -74,10 +75,10 @@
         },
         data() {
             return {
-                visible: this.showChat,
+                visible: false,
                 participants: [],
                 myself: {
-                    name: 'Anmol',
+                    name: '',
                     id: 9389857956,
                     profilePicture: 'https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg'
                 },
@@ -138,15 +139,16 @@
                 }
             }
         },
+        mounted() {
+            let num = this.$store.getters.getPhoneNumber;
+            this.myself.id = parseInt(num);
+        },
         watch: {
-            showChat: function (newVal, oldVal) {
-                console.log(newVal);
-                this.visible = newVal
-            },
             participantConfig: function (newVal, oldVal) {
                 var tempArray = [];
                 tempArray.push(newVal);
                 this.participants = tempArray;
+                this.visible = true;
                 console.log('Prop changed: ', newVal, ' | was: ', oldVal)
             },
             id: async function (newVal, oldVal) {
@@ -195,7 +197,6 @@
         },
         methods: {
             cleanChat: function (firebaseJson) {
-                console.log(firebaseJson);
                 let chat = firebaseJson.chat;
                 var message = [];
                 Object.keys(chat).forEach(function (key) {
@@ -247,7 +248,6 @@
                     }
                     message.push(obj);
                 });
-                console.log(message);
                 this.messages = message;
             },
             // eslint-disable-next-line
