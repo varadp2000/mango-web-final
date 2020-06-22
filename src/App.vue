@@ -1,10 +1,12 @@
 <template>
     <v-app>
         <v-main>
-            <div :v-show="!isLoggedIn">
+            {{isLoggedIn}}
+            <div v-if="!isLogIn()">
                 <login/>
             </div>
-            <div :v-show="isLoggedIn">
+            <div v-if="isLogIn()">
+                {{isLoggedIn}}
                 <contact-list/>
             </div>
         </v-main>
@@ -25,17 +27,23 @@ export default {
     return { token: null, isLoggedIn: false };
   },
 
-  data: () => ({
-    //
-  }),
-  watch: {},
+  watch: {
+    isLoggedIn(val) {
+      this.isLoggedIn = localStorage.getItem("isLoggedIn");
+    },
+  },
   created: function() {
     this.isLoggedIn = localStorage.getItem("isLoggedIn");
   },
   mounted: function() {
-    this.isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (localStorage.getItem("isLoggedIn"))
+      this.isLoggedIn = localStorage.getItem("isLoggedIn");
     this.token = localStorage.getItem("token");
-    console.log(localStorage.getItem("isLoggedIn"), this.isLoggedIn);
+  },
+  methods: {
+    isLogIn() {
+      return localStorage.getItem("isLoggedIn");
+    },
   },
 };
 </script>

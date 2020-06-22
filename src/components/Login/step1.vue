@@ -34,11 +34,11 @@ export default {
         url:
           "http://ec2-15-236-123-137.eu-west-3.compute.amazonaws.com/api/v1/user/sendotp",
         method: "post",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-          Accept: "*/*",
-        },
+        //headers: {
+        //  "Access-Control-Allow-Origin": "true",
+        //  "Content-Type": "application/json",
+        //  Accept: "*/*",
+        //},
         data: { phone_number: `${this.phone}` },
       };
       try {

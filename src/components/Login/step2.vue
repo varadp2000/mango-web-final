@@ -46,22 +46,17 @@ export default {
         method: "post",
         url:
           "http://ec2-15-236-123-137.eu-west-3.compute.amazonaws.com/api/v1/user/verifyotp",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-          Accept: "*/*",
-        },
         data: Formdata,
       };
       try {
         let resp = await axios(config);
-        console.log(resp.data);
         let token = resp.data.data.token;
         if (resp.data.code != 200)
           alert(JSON.stringify(resp.data.data.response_msg));
         else {
           localStorage.setItem("isLoggedIn", true);
           localStorage.setItem("token", token);
+          window.location.reload();
         }
       } catch (err) {
         console.log(err);

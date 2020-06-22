@@ -177,11 +177,8 @@ export default {
     },
     formatTime() {},
     logout() {
-      localStorage.removeItem("token");
-      localStorage.removeItem("phoneNo");
-      localStorage.removeItem("verificationToken");
-      localStorage.setItem("isLoggedIn", false);
-      window.location.reload()
+      localStorage.clear();
+      window.location.reload();
     },
   },
 };
