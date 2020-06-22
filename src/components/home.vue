@@ -83,7 +83,7 @@
                 },
                 messages: [],
                 chatTitle: 'My chat title',
-                placeholder: 'send your message',
+                placeholder: 'Send your message',
                 colors: {
                     header: {
                         bg: '#d30303',
@@ -328,6 +328,17 @@
                                 text: file.name,
                                 time_stamp: date.toString(),
                             });
+                            let senderKey_lastMessage = message.participantId + "_last_message";
+                            let senderKey_lastTimeStamp = message.participantId + "_last_time_stamp";
+                            let receiverKey_lastMessage = this.participants[0].id + "_last_message";
+                            let receiverKey_lastTimeStamp = this.participants[0].id + "_last_time_stamp";
+                            var obj = {
+                                [senderKey_lastMessage]: file.name,
+                                [senderKey_lastTimeStamp]: date.toString(),
+                                [receiverKey_lastMessage]: file.name,
+                                [receiverKey_lastTimeStamp]: date.toString(),
+                            };
+                            this.updateLastSettings(obj);
                         });
                     }
                 );

@@ -9,7 +9,7 @@
 
                     <v-spacer/>
                     <v-btn text @click="status = true">
-                        Status
+                        <status-icon :size="24"/>
                     </v-btn>
                     <v-btn icon>
                         <v-icon>mdi-magnify</v-icon>
@@ -59,11 +59,13 @@
     import db from "../firebase/firebaseInit";
     import home from "./home";
     import status from "./status";
+    import statusIcon from "./statusIcon";
 
     export default {
         components: {
             home,
             status,
+            statusIcon
         },
         data: () => ({
             contacts: [],

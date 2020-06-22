@@ -18,9 +18,11 @@
   ],
   "dependencies": {
     "@bachdgvn/vue-otp-input": "^1.0.8",
+    "axios": "^0.19.2",
     "core-js": "^2.6.5",
     "firebase": "^7.15.3",
     "luxon": "^1.21.3",
+    "v-emoji-picker": "^2.2.0",
     "vue": "^2.6.10",
     "vue-material-design-icons": "^4.4.0",
     "vue-otp-input": "^1.0.0",

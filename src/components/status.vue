@@ -3,9 +3,6 @@
         <v-app-bar color="primary" dark>
             <h1>Status</h1>
             <v-spacer/>
-            <v-btn style="font-size:20px" text>
-                <v-icon>mdi-plus-circle</v-icon>
-            </v-btn>
         </v-app-bar>
         <div style="display:flex">
             <v-list subheader style="width:20%">

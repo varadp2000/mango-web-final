@@ -1,5 +1,24 @@
 <template>
     <div class="container-message-manager">
+        <div class="icon-send-message">
+            <v-menu
+                    v-model="emojiMenu"
+                    :close-on-content-click="false"
+                    top offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                            icon
+                            v-bind="attrs"
+                            v-on="on">
+                        <v-icon>mdi-emoticon-outline</v-icon>
+                    </v-btn>
+                </template>
+
+                <v-card>
+                    <VEmojiPicker @select="selectEmoji"/>
+                </v-card>
+            </v-menu>
+        </div>
         <div class="message-text-box">
             <div ref="userInput" class="message-input" :placeholder="placeholder"
                  tabIndex="0" contenteditable="true"
@@ -8,23 +27,59 @@
         <div class="container-send-message icon-send-message" @click.prevent="sendMessage">
             <SendIcon :size="submitIconSize" :fill-color="colors.submitIcon"/>
         </div>
-        <div v-if="sendImages" class="container-send-message icon-send-message" @click="pickImage">
-            <input ref="inputImage" accept="image/*" type="file" style="display: none;" @input="handleImageChange">
-            <ImageIcon :size="submitImageIconSize" :fill-color="colors.submitImageIcon"/>
+        <div v-if="sendImages" class="container-send-message icon-send-message">
+            <input ref="inputImage" accept="/*" type="file" style="display: none;" @input="handleImageChange">
+            <!--                        <icon :size="submitImageIconSize" :fill-color="colors.submitImageIcon"/>-->
+            <v-menu
+                    v-model="menu"
+                    :close-on-content-click="false"
+                    :nudge-width="5"
+                    offset-x>
+                <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                            color="indigo"
+                            icon
+                            v-bind="attrs"
+                            v-on="on">
+                        <v-icon>mdi-paperclip</v-icon>
+                    </v-btn>
+                </template>
+
+                <v-list dense>
+                    <v-list-item-group v-model="item" color="primary">
+                        <v-list-item
+                                v-for="(item, i) in items"
+                                :key="i"
+                                @click="pickImage"
+                        >
+                            <v-list-item-icon>
+                                <v-icon v-text="item.icon"></v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item.text"></v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
+            </v-menu>
         </div>
+
     </div>
 </template>
 
 <script>
     //import 'vue-material-design-icons/styles.css';
+    import VEmojiPicker from 'v-emoji-picker';
     import {mapMutations} from 'vuex'
-    import { DateTime } from "luxon";
+    import {DateTime} from "luxon";
     import SendIcon from 'vue-material-design-icons/Send';
-    import ImageIcon from 'vue-material-design-icons/Image';
+    //import ImageIcon from 'vue-material-design-icons/Image';
+
     export default {
         components: {
             SendIcon,
-            ImageIcon
+            // ImageIcon,
+            VEmojiPicker
         },
         props: {
             /* onType: {
@@ -76,7 +131,17 @@
         },
         data() {
             return {
-                textInput: ''
+                textInput: '',
+                fav: true,
+                menu: false,
+                message: false,
+                hints: true,
+                item: 1,
+                items: [
+                    {text: 'Documents', icon: 'mdi-file-document-outline'},
+                    {text: 'Image', icon: 'mdi-image-multiple-outline'},
+                ],
+                emojiMenu: false,
             }
         },
         computed: {
@@ -88,6 +153,10 @@
             }
         },
         methods: {
+            selectEmoji(emoji) {
+                this.$refs.userInput.textContent = this.$refs.userInput.textContent+emoji.data;
+                console.log(emoji)
+            },
             ...mapMutations([
                 'newMessage'
             ]),
@@ -118,10 +187,10 @@
             handleType: function (e) {
                 this.$emit("onType", e);
             },
-            pickImage: function(){
+            pickImage: function () {
                 this.$refs.inputImage.click()
             },
-            handleImageChange: async function(e){
+            handleImageChange: async function (e) {
                 const files = e.target.files
                 let message = {
                     type: 'image',
