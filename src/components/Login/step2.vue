@@ -1,20 +1,24 @@
 <template>
-    <div>
-        <v-container style="text-align:center">
-            <input
-                id="partitioned"
-                type="text"
-                class="form-control"
-                placeholder="0"
-                maxlength="6">
-        </v-container>
-        <br>
-    </div>
+  <div>
+    <v-container style="text-align:center">
+      <input
+        id="partitioned"
+        type="text"
+        class="form-control"
+        placeholder="0"
+        maxlength="6"
+      />
+    </v-container>
+    <v-btn @click="submit">Submit</v-btn>
+    <br />
+  </div>
 </template>
 <script>
 export default {
   name: "app",
-
+  mounted: async function() {
+    console.log(localStorage.getItem("VerificationToken"));
+  },
   methods: {
     handleOnComplete(value) {
       console.log("OTP completed: ", value);
@@ -24,6 +28,9 @@ export default {
     },
     handleClearInput() {
       this.$refs.otpInput.clearInput();
+    },
+    submit() {
+      console.log(localStorage.getItem("VerificationToken"));
     },
   },
 };
