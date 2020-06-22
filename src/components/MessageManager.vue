@@ -2,14 +2,14 @@
     <div class="container-message-manager">
         <div class="icon-send-message">
             <v-menu
-                    v-model="emojiMenu"
-                    :close-on-content-click="false"
-                    top offset-y>
+                v-model="emojiMenu"
+                :close-on-content-click="false"
+                top offset-y>
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                            icon
-                            v-bind="attrs"
-                            v-on="on">
+                        icon
+                        v-bind="attrs"
+                        v-on="on">
                         <v-icon>mdi-emoticon-outline</v-icon>
                     </v-btn>
                 </template>
@@ -31,16 +31,16 @@
             <input ref="inputImage" accept="/*" type="file" style="display: none;" @input="handleImageChange">
             <!--                        <icon :size="submitImageIconSize" :fill-color="colors.submitImageIcon"/>-->
             <v-menu
-                    v-model="menu"
-                    :close-on-content-click="false"
-                    :nudge-width="5"
-                    offset-x>
+                v-model="menu"
+                :close-on-content-click="false"
+                :nudge-width="5"
+                offset-x>
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
-                            color="indigo"
-                            icon
-                            v-bind="attrs"
-                            v-on="on">
+                        color="indigo"
+                        icon
+                        v-bind="attrs"
+                        v-on="on">
                         <v-icon>mdi-paperclip</v-icon>
                     </v-btn>
                 </template>
@@ -48,22 +48,20 @@
                 <v-list dense>
                     <v-list-item-group v-model="item" color="primary">
                         <v-list-item
-                                v-for="(item, i) in items"
-                                :key="i"
-                                @click="pickImage"
-                        >
+                            v-for="(item, i) in items"
+                            :key="i"
+                            @click="pickImage">
                             <v-list-item-icon>
-                                <v-icon v-text="item.icon"></v-icon>
+                                <v-icon v-text="item.icon"/>
                             </v-list-item-icon>
                             <v-list-item-content>
-                                <v-list-item-title v-text="item.text"></v-list-item-title>
+                                <v-list-item-title v-text="item.text"/>
                             </v-list-item-content>
                         </v-list-item>
                     </v-list-item-group>
                 </v-list>
             </v-menu>
         </div>
-
     </div>
 </template>
 

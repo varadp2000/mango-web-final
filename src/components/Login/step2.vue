@@ -1,17 +1,16 @@
 <template>
-  <div>
-    <v-container style="text-align:center">
-      <input
-        id="partitioned"
-        type="text"
-        class="form-control"
-        placeholder="0"
-        maxlength="6"
-        v-model="otp"
-      />
-    </v-container>
-    <br />
-  </div>
+    <div>
+        <v-container style="text-align:center">
+            <input
+                id="partitioned"
+                v-model="otp"
+                type="text"
+                class="form-control"
+                placeholder="0"
+                maxlength="6">
+        </v-container>
+        <br>
+    </div>
 </template>
 <script>
 import axios from "axios";

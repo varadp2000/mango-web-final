@@ -1,16 +1,14 @@
 <template>
-  <div style="text-align:center">
-    <img
-      src="https://www.w3schools.com/howto/img_avatar.png"
-      style="border-radius:100%;max-width:300px"
-    />
-    <vue-tel-input
-      v-model="phone"
-      @country-changed="countryChanged"
-      mode="international"
-      required
-    /><br />
-  </div>
+    <div style="text-align:center">
+        <img
+            src="https://www.w3schools.com/howto/img_avatar.png"
+            style="border-radius:100%;max-width:300px">
+        <vue-tel-input
+            v-model="phone"
+            mode="international"
+            required
+            @country-changed="countryChanged"/><br>
+    </div>
 </template>
 
 <script>

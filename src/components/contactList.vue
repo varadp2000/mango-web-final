@@ -1,70 +1,66 @@
 <template>
-  <v-container class="grey lighten-5">
-    <div style="display:flex">
-      <div style="width:40%;">
-        <v-toolbar color="#d30303" dark>
-          <v-app-bar-nav-icon />
+    <v-container class="grey lighten-5">
+        <div style="display:flex">
+            <div style="width:40%;">
+                <v-toolbar color="#d30303" dark>
+                    <v-app-bar-nav-icon/>
 
-          <v-toolbar-title>New Chat</v-toolbar-title>
+                    <v-toolbar-title>New Chat</v-toolbar-title>
 
-          <v-spacer />
-          <v-btn text @click="status = true">
-            <status-icon :size="24" />
-          </v-btn>
-          <v-btn icon>
-            <v-icon>mdi-magnify</v-icon>
-          </v-btn>
-          <v-btn text @click="logout">Logout</v-btn>
-        </v-toolbar>
-        <v-list subheader>
-          <v-subheader>Recent chat</v-subheader>
+                    <v-spacer/>
+                    <v-btn text @click="status = true">
+                        <status-icon :size="24"/>
+                    </v-btn>
+                    <v-btn icon>
+                        <v-icon>mdi-magnify</v-icon>
+                    </v-btn>
+                    <v-btn text @click="logout">Logout</v-btn>
+                </v-toolbar>
+                <v-list subheader>
+                    <v-subheader>Recent chat</v-subheader>
 
-          <v-list-item
-            v-for="(item, index) in contacts"
-            :key="item.key"
-            @click="setContact(item.key, index)"
-          >
-            <v-list-item-avatar>
-              <v-img :src="item.avatar" />
-            </v-list-item-avatar>
+                    <v-list-item
+                        v-for="(item, index) in contacts"
+                        :key="item.key"
+                        @click="setContact(item.key, index)">
+                        <v-list-item-avatar>
+                            <v-img :src="item.avatar"/>
+                        </v-list-item-avatar>
 
-            <v-list-item-content>
-              <v-list-item-title v-text="item.name" />
-              <v-list-item-subtitle>{{
-                item.lastMessage
-              }}</v-list-item-subtitle>
-            </v-list-item-content>
+                        <v-list-item-content>
+                            <v-list-item-title v-text="item.name"/>
+                            <v-list-item-subtitle>
+                                {{item.lastMessage}}
+                            </v-list-item-subtitle>
+                        </v-list-item-content>
 
-            <v-list-item-icon>
-              <span>{{
-                new Date(parseInt(item.time)).toLocaleString("en-US", {
-                  hour: "numeric",
-                  minute: "numeric",
-                  hour12: true,
-                })
-              }}</span>
-            </v-list-item-icon>
-          </v-list-item>
-        </v-list>
-      </div>
-      <div style="width:100%">
-        <home
-          :id="key"
-          :participant-config="participant"
-          :show-chat="showChat"
-        />
-      </div>
-    </div>
-    <v-dialog v-model="status" fullscreen transition="dialog-bottom-transition">
-      <v-card>
-        <v-row>
-          <v-spacer />
-          <v-btn text @click="status = false">X</v-btn>
-        </v-row>
-        <status />
-      </v-card>
-    </v-dialog>
-  </v-container>
+                        <v-list-item-icon>
+                            <span>{{new Date(parseInt(item.time)).toLocaleString("en-US", {
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                            })}}</span>
+                        </v-list-item-icon>
+                    </v-list-item>
+                </v-list>
+            </div>
+            <div style="width:100%">
+                <home
+                    :id="key"
+                    :participant-config="participant"
+                    :show-chat="showChat"/>
+            </div>
+        </div>
+        <v-dialog v-model="status" fullscreen transition="dialog-bottom-transition">
+            <v-card>
+                <v-row>
+                    <v-spacer/>
+                    <v-btn text @click="status = false">X</v-btn>
+                </v-row>
+                <status/>
+            </v-card>
+        </v-dialog>
+    </v-container>
 </template>
 <script>
 import db from "../firebase/firebaseInit";
