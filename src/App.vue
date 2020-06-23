@@ -2,10 +2,10 @@
     <v-app>
         <v-main>
             <div v-if="!auth">
-            <login/>
+                <login/>
             </div>
             <div v-else>
-            <contact-list/>
+                <contact-list/>
             </div>
         </v-main>
     </v-app>
@@ -14,7 +14,8 @@
 <script>
     import contactList from "./components/contactList";
     import login from "./components/Login";
-    import {mapGetters} from "vuex";
+    import {mapGetters, mapMutations} from 'vuex';
+    import store from './store'
 
     export default {
         name: "app",
@@ -29,6 +30,9 @@
             auth() {
                 return this.authStatus
             },
+        },
+        beforeCreate() {
+            this.$store = store();
         },
         data: function () {
             return {token: null, isLoggedIn: false};

@@ -1,23 +1,20 @@
 <template>
     <div>
-
         <h2>Please Enter OTP</h2>
-        <br/>
+        <br>
         <div style="display: flex; flex-direction: row; justify-content: center;
   align-items: center;">
             <v-otp-input
-                    ref="otpInput1"
-                    input-classes="otp-input"
-                    separator="-"
-                    :num-inputs="6"
-                    :should-auto-focus="true"
-                    input-type="number"
-                    @on-change="handleOnChange"
-                    @on-complete="handleOnComplete"
-            />
+                ref="otpInput1"
+                input-classes="otp-input"
+                separator="-"
+                :num-inputs="6"
+                :should-auto-focus="true"
+                input-type="number"
+                @on-change="handleOnChange"
+                @on-complete="handleOnComplete"/>
         </div>
-        <br/>
-
+        <br>
     </div>
 </template>
 
@@ -26,7 +23,7 @@
     import axios from "axios";
 
     export default {
-        name: "App",
+        name: "app",
         data: function () {
             return {
                 otp: null,

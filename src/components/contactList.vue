@@ -20,9 +20,9 @@
                     <v-subheader>Recent chat</v-subheader>
 
                     <v-list-item
-                            v-for="(item, index) in contacts"
-                            :key="item.key"
-                            @click="setContact(item.key, index)">
+                        v-for="(item, index) in contacts"
+                        :key="item.key"
+                        @click="setContact(item.key, index)">
                         <v-list-item-avatar>
                             <v-img :src="item.avatar"/>
                         </v-list-item-avatar>
@@ -46,8 +46,8 @@
             </div>
             <div style="width:100%">
                 <home
-                        :id="key"
-                        :participant-config="participant"/>
+                    :id="key"
+                    :participant-config="participant"/>
             </div>
         </div>
         <v-dialog v-model="status" fullscreen transition="dialog-bottom-transition">
@@ -66,8 +66,8 @@
     import home from "./home";
     import status from "./status";
     import statusIcon from "./statusIcon";
-    import {mapGetters} from "vuex";
-
+    import {mapGetters, mapMutations} from 'vuex';
+    import store from '../store'
     export default {
         components: {
             home,
@@ -82,37 +82,53 @@
             participant: {},
             status: false,
         }),
+        beforeCreate() {
+            this.$store = store();
+        },
         computed: {
             ...mapGetters({
                 sender: 'getPhoneNumber',
             }),
         },
         watch: {
-            async contacts(val) {
+            chatStatus(newVal, oldVal) {
+                console.log(newVal);
+                console.log(oldVal);
+            },
+            // async contacts(val) {
+            //     try {
+            //         await db
+            //             .ref(`contacts/${val}`)
+            //             .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
+            //     } catch (err) {
+            //         this.loading = false;
+            //     } finally {
+            //         this.loading = true;
+            //     }
+            // },
+        },
+        created: async function () {
+            this.fetchData();
+        },
+        methods: {
+            async fetchData() {
+                this.loading = false;
                 try {
                     await db
-                        .ref(`contacts/${val}`)
-                        .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
+                        .ref(`contacts/${this.sender}`)
+                        .on("value", (snapshot) => {
+                            this.createContactsArray(snapshot.val())
+                            var dbContacts = snapshot.val().chatContacts;
+                            for (const key of Object.keys(dbContacts)) {
+                                this.setListner(dbContacts[key].key, snapshot.val())
+                            }
+                        });
                 } catch (err) {
                     this.loading = false;
                 } finally {
                     this.loading = true;
                 }
             },
-        },
-        created: async function () {
-            this.loading = false;
-            try {
-                await db
-                    .ref(`contacts/${this.sender}`)
-                    .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
-            } catch (err) {
-                this.loading = false;
-            } finally {
-                this.loading = true;
-            }
-        },
-        methods: {
             async createContactsArray(firebaseJson) {
                 var contacts = [];
                 var dbContacts = firebaseJson.chatContacts;
@@ -161,7 +177,6 @@
             },
             getLastTimeStamp(key) {
                 var lastMessage_key = this.sender + "_last_time_stamp";
-                console.log(lastMessage_key);
                 return db
                     .ref(`messages/${key}/${lastMessage_key}`)
                     .once("value")
@@ -183,6 +198,12 @@
                 localStorage.clear();
                 window.location.reload();
             },
+            setListner(key, value){
+                var lastMessage_key = this.sender + "_last_message";
+                db
+                    .ref(`messages/${key}/${lastMessage_key}`)
+                    .on("value", (snapshot)=> this.createContactsArray(value));
+            }
         },
     };
 </script>

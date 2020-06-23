@@ -139,10 +139,6 @@
                 }
             }
         },
-        mounted() {
-            let num = this.$store.getters.getPhoneNumber;
-            this.myself.id = parseInt(num);
-        },
         watch: {
             participantConfig: function (newVal, oldVal) {
                 var tempArray = [];
@@ -191,6 +187,10 @@
             //         this.loading = true;
             //     }
             // },
+        },
+        mounted() {
+            let num = this.$store.getters.getPhoneNumber;
+            this.myself.id = parseInt(num);
         },
         async created() {
 
