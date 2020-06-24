@@ -33,7 +33,7 @@
                                 @click="step2">
                                 Verify
                             </v-btn>
-                            <v-btn color="error" outlined @click="e1 = 1">
+                            <v-btn color="error" outlined @click="$store.state.e1 = 1">
                                 Change Number
                             </v-btn>
                         </v-container>
@@ -47,21 +47,23 @@
 <script>
 import step1 from "./Login/step1";
 import step2 from "./Login/step2";
+import { mapGetters } from "vuex";
 export default {
   components: { step1, step2 },
   data: function() {
     return {
-      e1: 1,
+      //e1: 1,
     };
+  },
+  computed: {
+    ...mapGetters(["e1"]),
   },
   methods: {
     step1: async function() {
       await this.$refs.step1.submit();
-      this.e1++;
     },
     step2: async function() {
       await this.$refs.step2.submit();
-      this.e1++;
     },
   },
 };
