@@ -111,6 +111,9 @@
             this.fetchData();
         },
         methods: {
+            ...mapMutations([
+                'setChatList'
+            ]),
             async fetchData() {
                 this.loading = false;
                 try {
@@ -150,6 +153,7 @@
                     contacts.push(obj);
                 }
                 contacts.sort((a, b) => (a.time < b.time ? 1 : -1));
+                this.setChatList(contacts);
                 this.contacts = contacts;
             },
             getLastMessage(key) {

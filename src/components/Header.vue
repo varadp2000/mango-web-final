@@ -10,10 +10,9 @@
                 <span v-for="(participant, index) in participants" :key="participant.id">{{participant.name}}{{participants.length - index - 1 ? ', ' : ''}}</span>
             </p>
         </div>
-
-        <div v-if="!hideCloseButton && !hasHeaderSlot" class="header-exit">
+        <div class="header-exit">
             <slot name="close-button">
-                <a class="header-exit-button" href="#" :style="{fontSize: closeButtonIconSize}"
+                <a class="header-exit-button" href="#" style="float: right;"
                    @click.prevent="onClose">✕</a>
             </slot>
         </div>
@@ -74,7 +73,7 @@
         },
         methods:{
             onClose: function(){
-                this.$emit("onClose")
+                this.$emit("onClose", )
             }
         }
     }
@@ -82,7 +81,7 @@
 
 <style lang="less">
     .quick-chat-container .header-container {
-        height: 70px;
+        height: 71px;
         display: flex;
         padding: 0 20px 0 10px;
         align-items: center;

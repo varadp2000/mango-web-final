@@ -5,6 +5,7 @@
             <div class="message-loading"></div>
         </div>
         <div v-for="(message, index) in messages" :key="index" class="message-container">
+            <v-checkbox v-model="selected" :value="message"></v-checkbox>
             <MyMessage v-if="message.myself" :message="message" :async-mode="asyncMode"
                        :colors="colors"
                        :profile-picture-config="profilePictureConfig"
@@ -67,6 +68,7 @@
                 updateScroll: true,
                 lastMessage: null,
                 loading: false,
+                selected:[]
             }
         },
         computed: {
@@ -75,6 +77,12 @@
                 'messages',
                 'myself'
             ]),
+        },
+        watch:{
+          selected: function (newVal, oldVal) {
+                this.selectMessage(newVal);
+
+          }
         },
         mounted() {
             this.goToBottom();
@@ -94,7 +102,11 @@
         methods: {
             ...mapMutations([
                 'setMessages',
+                'setSelectedMessage'
             ]),
+            selectMessage(value){
+                this.setSelectedMessage(value);
+            },
             /**
              * This function compare two messages without looking at the uploaded propertie.
              * This function has been implemented to prevent chat scrolling down after changing the message from 'uploaded = false' to 'uploaded = true'.

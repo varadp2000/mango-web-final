@@ -43,6 +43,53 @@
                 </div>
             </template>
         </Chat>
+        <v-dialog
+                v-model="dialog"
+                max-width="500"
+        >
+            <v-card>
+                <v-card-title class="headline">Select Contact</v-card-title>
+
+                <v-card-text>
+                    <v-list subheader>
+                        <v-subheader>Recent chat</v-subheader>
+
+                        <v-list-item
+                                v-for="(item, index) in getChatList"
+                                :key="item.key">
+                            <v-checkbox v-model="selectedContact" :value="item"></v-checkbox>
+                            <v-list-item-avatar>
+                                <v-img :src="item.avatar"/>
+                            </v-list-item-avatar>
+
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item.name"/>
+                            </v-list-item-content>
+
+                            <v-list-item-icon>
+                            <span>{{new Date(parseInt(item.time)).toLocaleString("en-US", {
+                                hour: "numeric",
+                                minute: "numeric",
+                                hour12: true,
+                            })}}</span>
+                            </v-list-item-icon>
+                        </v-list-item>
+                    </v-list>
+                </v-card-text>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+
+                    <v-btn
+                            color="green darken-1"
+                            text
+                            @click="forwardMessage"
+                    >
+                        Forward
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -75,6 +122,8 @@
         },
         data() {
             return {
+                selectedContact: [],
+                dialog: false,
                 visible: false,
                 participants: [],
                 myself: {
@@ -139,7 +188,16 @@
                 }
             }
         },
+        computed: {
+            ...mapGetters([
+                'getChatList',
+                'getSelectedMessages',
+            ]),
+        },
         watch: {
+            selectedContact: function (newVal, oldValue) {
+                console.log(newVal);
+            },
             participantConfig: function (newVal, oldVal) {
                 var tempArray = [];
                 tempArray.push(newVal);
@@ -276,7 +334,7 @@
                 */
                 // timeout simulating the request
                 var text = message.content;
-                var date = date = new Date(message.timestamp).getTime();
+                var date = new Date(message.timestamp).getTime();
                 setTimeout(() => {
                     text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
                     db.ref(`messages/${this.id}/chat`).push({
@@ -305,7 +363,8 @@
             },
             onClose(param) {
                 console.log(param)
-                this.visible = false;
+                this.dialog = true;
+                //this.visible = false;
             },
             onImageSelected({file, message}) {
                 let uploadValue;
@@ -354,6 +413,37 @@
                  * You can add your code here to do whatever you need with the image clicked. A common situation is to display the image clicked in full screen.
                  */
                 console.log('Image clicked', message.src)
+            },
+            forwardMessage() {
+                console.warn(this.getSelectedMessages);
+                this.selectedContact.forEach(contact => {
+                    console.log(contact);
+                    this.getSelectedMessages.forEach(message => {
+                        console.log(message);
+                        var text = message.content;
+                        var date = new Date().getTime();
+                        text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
+                        db.ref(`messages/${contact.key}/chat`).push({
+                            is_blocked: "0",
+                            sender_id: this.myself.id.toString(),
+                            text: text,
+                            time_stamp: date.toString(),
+                        });
+                        message.uploaded = true;
+                        message.viewed = true;
+                        let senderKey_lastMessage = this.myself.id + "_last_message";
+                        let senderKey_lastTimeStamp = this.myself.id + "_last_time_stamp";
+                        let receiverKey_lastMessage = contact.phoneNumber + "_last_message";
+                        let receiverKey_lastTimeStamp = contact.phoneNumber + "_last_time_stamp";
+                        var obj = {
+                            [senderKey_lastMessage]: text,
+                            [senderKey_lastTimeStamp]: date.toString(),
+                            [receiverKey_lastMessage]: text,
+                            [receiverKey_lastTimeStamp]: date.toString(),
+                        };
+                        this.updateLastSettings(obj);
+                    });
+                })
             }
         },
     }

@@ -17,6 +17,8 @@ export default () => {
       phoneNumber: localStorage.getItem("phone") || null,
       e1: 1,
       countryCode: "+91",
+      chatList:[],
+      selectedMessages:[],
     },
     mutations: {
       newMessage: (state, message) => {
@@ -57,6 +59,12 @@ export default () => {
         state.phoneNumber = payload.num;
         state.countryCode = `+${payload.country}`;
       },
+      setChatList:(state, payload)=>{
+        state.chatList = payload;
+      },
+      setSelectedMessage:(state, payload)=>{
+        state.selectedMessages = payload
+      }
     },
     actions: {},
     getters: {
@@ -94,6 +102,14 @@ export default () => {
       getCountryCode: (state) => {
         return state.countryCode;
       },
+      getChatList:(state)=>{
+          return state.chatList;
+      },
+      getSelectedMessages:(state)=>{
+        console.warn("in store");
+        console.warn(state.selectedMessages);
+        return state.selectedMessages
+      }
     },
   });
 };
