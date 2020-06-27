@@ -97,7 +97,7 @@
     import Chat from './Chat.vue'
     import db from "../firebase/firebaseInit";
     import firebase from "firebase";
-    import {mapGetters} from "vuex";
+    import {mapGetters, mapMutations} from "vuex";
 
     export default {
         components: {
@@ -246,6 +246,9 @@
             //     }
             // },
         },
+        beforeMount() {
+            this.selectedContact = [];
+        },
         mounted() {
             let num = this.$store.getters.getPhoneNumber;
             this.myself.id = parseInt(num);
@@ -254,6 +257,10 @@
 
         },
         methods: {
+            ...mapMutations([
+                'setSelectedMessage',
+                'setFlag'
+            ]),
             cleanChat: function (firebaseJson) {
                 let chat = firebaseJson.chat;
                 var message = [];
@@ -306,7 +313,8 @@
                     }
                     message.push(obj);
                 });
-                this.messages = message;
+                this.toLoad = message.slice(0, (message.length - 5));
+                this.messages = message.slice(1).slice(-5);
             },
             // eslint-disable-next-line
             onType: function (e) {
@@ -319,7 +327,7 @@
                     //Make sure the loaded messages are also added to our local messages copy or they will be lost
                     this.messages.unshift(...this.toLoad);
                     this.toLoad = [];
-                }, 1000);
+                }, 2000);
             },
             onMessageSubmit(message) {
                 /*
@@ -358,8 +366,8 @@
                     this.updateLastSettings(obj);
                 }, 2000);
             },
-            updateLastSettings(object) {
-                db.ref(`messages/${this.id}`).update(object);
+            updateLastSettings(object, key) {
+                db.ref(`messages/${key}`).update(object);
             },
             onClose(param) {
                 console.log(param)
@@ -417,33 +425,33 @@
             forwardMessage() {
                 console.warn(this.getSelectedMessages);
                 this.selectedContact.forEach(contact => {
-                    console.log(contact);
                     this.getSelectedMessages.forEach(message => {
-                        console.log(message);
-                        var text = message.content;
-                        var date = new Date().getTime();
-                        text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
-                        db.ref(`messages/${contact.key}/chat`).push({
-                            is_blocked: "0",
-                            sender_id: this.myself.id.toString(),
-                            text: text,
-                            time_stamp: date.toString(),
-                        });
-                        message.uploaded = true;
-                        message.viewed = true;
-                        let senderKey_lastMessage = this.myself.id + "_last_message";
-                        let senderKey_lastTimeStamp = this.myself.id + "_last_time_stamp";
-                        let receiverKey_lastMessage = contact.phoneNumber + "_last_message";
-                        let receiverKey_lastTimeStamp = contact.phoneNumber + "_last_time_stamp";
-                        var obj = {
-                            [senderKey_lastMessage]: text,
-                            [senderKey_lastTimeStamp]: date.toString(),
-                            [receiverKey_lastMessage]: text,
-                            [receiverKey_lastTimeStamp]: date.toString(),
-                        };
-                        this.updateLastSettings(obj);
+                        setTimeout(() => {
+                            var text = message.content;
+                            var date = new Date().getTime();
+                            text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
+                            db.ref(`messages/${contact.key}/chat`).push({
+                                is_blocked: "0",
+                                sender_id: this.myself.id.toString(),
+                                text: text,
+                                time_stamp: date.toString(),
+                            });
+                            let senderKey_lastMessage = this.myself.id + "_last_message";
+                            let senderKey_lastTimeStamp = this.myself.id + "_last_time_stamp";
+                            let receiverKey_lastMessage = contact.phoneNumber + "_last_message";
+                            let receiverKey_lastTimeStamp = contact.phoneNumber + "_last_time_stamp";
+                            var obj = {
+                                [senderKey_lastMessage]: text,
+                                [senderKey_lastTimeStamp]: date.toString(),
+                                [receiverKey_lastMessage]: text,
+                                [receiverKey_lastTimeStamp]: date.toString(),
+                            };
+                            this.updateLastSettings(obj, contact.key);
+                        }, 1000);
                     });
-                })
+                });
+                this.dialog = false;
+                this.setSelectedMessage([]);
             }
         },
     }

@@ -20,9 +20,9 @@
                     <v-subheader>Recent chat</v-subheader>
 
                     <v-list-item
-                        v-for="(item, index) in contacts"
-                        :key="item.key"
-                        @click="setContact(item.key, index)">
+                            v-for="(item, index) in contacts"
+                            :key="item.key"
+                            @click="setContact(item.key, index)">
                         <v-list-item-avatar>
                             <v-img :src="item.avatar"/>
                         </v-list-item-avatar>
@@ -35,19 +35,15 @@
                         </v-list-item-content>
 
                         <v-list-item-icon>
-                            <span>{{new Date(parseInt(item.time)).toLocaleString("en-US", {
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: true,
-                            })}}</span>
+                            <span>{{item.time}}</span>
                         </v-list-item-icon>
                     </v-list-item>
                 </v-list>
             </div>
             <div style="width:100%">
                 <home
-                    :id="key"
-                    :participant-config="participant"/>
+                        :id="key"
+                        :participant-config="participant"/>
             </div>
         </div>
         <v-dialog v-model="status" fullscreen transition="dialog-bottom-transition">
@@ -62,12 +58,16 @@
     </v-container>
 </template>
 <script>
+    import TimeAgo from 'javascript-time-ago'
+
+    // Load locale-specific relative date/time formatting rules.
+    import en from 'javascript-time-ago/locale/en'
     import db from "../firebase/firebaseInit";
     import home from "./home";
     import status from "./status";
     import statusIcon from "./statusIcon";
     import {mapGetters, mapMutations} from 'vuex';
-    import store from '../store'
+
     export default {
         components: {
             home,
@@ -82,9 +82,6 @@
             participant: {},
             status: false,
         }),
-        beforeCreate() {
-            this.$store = store();
-        },
         computed: {
             ...mapGetters({
                 sender: 'getPhoneNumber',
@@ -133,6 +130,8 @@
                 }
             },
             async createContactsArray(firebaseJson) {
+                TimeAgo.addLocale(en);
+                const timeAgo = new TimeAgo('en-US');
                 var contacts = [];
                 var dbContacts = firebaseJson.chatContacts;
                 for (const key of Object.keys(dbContacts)) {
@@ -153,17 +152,18 @@
                     contacts.push(obj);
                 }
                 contacts.sort((a, b) => (a.time < b.time ? 1 : -1));
+                for (var i in contacts) {
+                    contacts[i].time = timeAgo.format(Date.now()-(Date.now()-contacts[i].time),'time');
+                }
                 this.setChatList(contacts);
                 this.contacts = contacts;
             },
             getLastMessage(key) {
                 var lastMessage_key = this.sender + "_last_message";
-                console.log(lastMessage_key);
                 return db
                     .ref(`messages/${key}/${lastMessage_key}`)
                     .once("value")
                     .then(function (snapshot) {
-                        console.log(snapshot.val());
                         return snapshot.val();
                     });
             },
@@ -185,7 +185,6 @@
                     .ref(`messages/${key}/${lastMessage_key}`)
                     .once("value")
                     .then(function (snapshot) {
-                        console.log(snapshot.val());
                         return snapshot.val();
                     });
             },
@@ -202,11 +201,11 @@
                 localStorage.clear();
                 window.location.reload();
             },
-            setListner(key, value){
+            setListner(key, value) {
                 var lastMessage_key = this.sender + "_last_message";
                 db
                     .ref(`messages/${key}/${lastMessage_key}`)
-                    .on("value", (snapshot)=> this.createContactsArray(value));
+                    .on("value", (snapshot) => this.createContactsArray(value));
             }
         },
     };

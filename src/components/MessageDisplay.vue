@@ -5,7 +5,7 @@
             <div class="message-loading"></div>
         </div>
         <div v-for="(message, index) in messages" :key="index" class="message-container">
-            <v-checkbox v-model="selected" :value="message"></v-checkbox>
+            <v-checkbox v-model="selected" :value="message"/>
             <MyMessage v-if="message.myself" :message="message" :async-mode="asyncMode"
                        :colors="colors"
                        :profile-picture-config="profilePictureConfig"
@@ -22,11 +22,12 @@
 
 <script>
     import {mapGetters, mapMutations} from 'vuex';
-    import { DateTime } from "luxon";
+    import {DateTime} from "luxon";
     import MyMessage from './MyMessage.vue';
     import OtherMessage from './OtherMessage.vue';
+
     export default {
-        components:{
+        components: {
             MyMessage,
             OtherMessage
         },
@@ -68,7 +69,7 @@
                 updateScroll: true,
                 lastMessage: null,
                 loading: false,
-                selected:[]
+                selected: []
             }
         },
         computed: {
@@ -77,12 +78,26 @@
                 'messages',
                 'myself'
             ]),
+            checkedMsg() {
+                return this.selected
+            }
         },
-        watch:{
-          selected: function (newVal, oldVal) {
-                this.selectMessage(newVal);
-
-          }
+        watch: {
+            selected: function (newVal, oldVal) {
+                console.warn(this.checkedMsg);
+                if(this.checkedMsg === null){
+                    this.selected = [];
+                }
+                if (this.checkedMsg.length > 0) {
+                    this.selectMessage(this.checkedMsg);
+                }
+            },
+        },
+        beforeCreate() {
+            this.selected = [];
+        },
+        beforeMount() {
+            this.selected = [];
         },
         mounted() {
             this.goToBottom();
@@ -91,7 +106,7 @@
         updated() {
             if (this.messages.length && !this.messageCompare(this.messages[this.messages.length - 1], this.lastMessage)) {
 
-                if(this.updateScroll || (this.scrollBottom.messageSent && this.messages[this.messages.length - 1].participantId == this.myself.id) || (this.scrollBottom.messageReceived && this.messages[this.messages.length - 1].participantId != this.myself.id)){
+                if (this.updateScroll || (this.scrollBottom.messageSent && this.messages[this.messages.length - 1].participantId == this.myself.id) || (this.scrollBottom.messageReceived && this.messages[this.messages.length - 1].participantId != this.myself.id)) {
                     this.goToBottom();
                     if (this.messages.length) {
                         this.lastMessage = this.messages[this.messages.length - 1]
@@ -102,9 +117,9 @@
         methods: {
             ...mapMutations([
                 'setMessages',
-                'setSelectedMessage'
+                'setSelectedMessage',
             ]),
-            selectMessage(value){
+            selectMessage(value) {
                 this.setSelectedMessage(value);
             },
             /**
@@ -114,11 +129,11 @@
              * @param {Object} message2 the second message object
              * @return {Boolean} true if the messages are equal and false if they are different
              */
-            messageCompare(message1, message2){
+            messageCompare(message1, message2) {
                 /**
                  * if one of the messages are null, you can safely compare the messages with '==='
                  */
-                if(!message2 || !message1){
+                if (!message2 || !message1) {
                     return message1 === message2
                 }
                 /**
@@ -128,7 +143,7 @@
                 let content_equal = message1.content == message2.content;
                 let timestamp_equal = message1.timestamp.valueOf() === message2.timestamp.valueOf();
 
-                return  participant_equal && content_equal && timestamp_equal
+                return participant_equal && content_equal && timestamp_equal
             },
             updateScrollState({target: {scrollTop, clientHeight, scrollHeight}}) {
                 this.updateScroll = scrollTop + clientHeight >= scrollHeight;
@@ -137,14 +152,14 @@
                     this.loading = true;
                     this.loadMoreMessages((messages) => {
                         //if (Array.isArray(messages) && messages.length > 0) {
-                            /**
-                             * this code will be removed before the next release
-                             *
-                             * this line is commented because the setMessages is already called
-                             * when 'this.messages.unshift(...this.toLoad)' is executed at App.vue line 177
-                             * it was executing the same function twice, causing unexpected behavior with Luxon date objects
-                            */
-                            //this.setMessages([...messages, ...this.messages]);
+                        /**
+                         * this code will be removed before the next release
+                         *
+                         * this line is commented because the setMessages is already called
+                         * when 'this.messages.unshift(...this.toLoad)' is executed at App.vue line 177
+                         * it was executing the same function twice, causing unexpected behavior with Luxon date objects
+                         */
+                        //this.setMessages([...messages, ...this.messages]);
                         //}
                         this.loading = false;
                     });
@@ -156,7 +171,7 @@
 
                 this.updateScroll = false;
             },
-            onImageClicked(message){
+            onImageClicked(message) {
                 this.$emit("onImageClicked", message)
             }
         }
@@ -172,17 +187,18 @@
         flex-direction: column;
         padding-bottom: 10px;
         max-height: 100%;
-                /************** Safari 10.1+ ********************/
-        @media not all and (min-resolution:.001dpcm)
-        { @supports (-webkit-appearance:none) {
+        /************** Safari 10.1+ ********************/
+        @media not all and (min-resolution: .001dpcm) {
+            @supports (-webkit-appearance:none) {
 
-            .message-container{
-                display:-webkit-box !important;
+                .message-container {
+                    display: -webkit-box !important;
+                }
+
             }
+        }
 
-        }}
-
-        .message-image{
+        .message-image {
             padding: 6px 10px;
             border-radius: 15px;
             margin: 5px 0 5px 0;
@@ -193,14 +209,14 @@
             justify-content: center;
         }
 
-        .message-image-display{
+        .message-image-display {
             width: 100%;
             border-radius: 5px;
-            cursor:pointer;
+            cursor: pointer;
             transition: 0.3s ease;
         }
 
-        .message-image-display:hover{
+        .message-image-display:hover {
             opacity: 0.8;
         }
 
@@ -251,12 +267,12 @@
         }
 
         .message-loading {
-            height: 8px;
-            width: 8px;
+            height: 16px;
+            width: 16px;
             border: 1px solid rgb(187, 183, 183);
             border-left-color: rgb(59, 59, 59);
             border-radius: 50%;
-            margin-left: 5px;
+            margin-left: 50px;
             display: inline-block;
             animation: spin 1.3s ease infinite;
         }
@@ -264,10 +280,10 @@
         .loader .message-loading {
             width: 16px;
             height: 16px;
-            margin: 5px 0 0 0;
+            margin: 5px 0 0 250px;
         }
 
-        .img-loading{
+        .img-loading {
             height: 20px;
             width: 20px;
             border: 3px solid #ffffff00;
@@ -281,11 +297,11 @@
             position: absolute;
         }
 
-        .img-overlay{
+        .img-overlay {
             opacity: 0.4;
         }
 
-        .message-username-image{
+        .message-username-image {
             margin: 10px 10px 0px 10px;
             font-size: 12px;
             font-weight: bold;

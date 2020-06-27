@@ -1,7 +1,7 @@
 <template>
     <div class="quick-chat-container"
          :style="{'border-bottom-left-radius': borderStyle.bottomLeft, 'border-bottom-right-radius': borderStyle.bottomRight, 'border-top-right-radius': borderStyle.topRight, 'border-top-left-radius': borderStyle.topLeft}">
-        <Header v-if="displayHeader" :colors="colors" :border-style="borderStyle" 
+        <Header v-if="displayHeader" :colors="colors" :border-style="borderStyle"
                 :hide-close-button="hideCloseButton" :close-button-icon-size="closeButtonIconSize" @onClose="onClose()">
             <template #header>
                 <slot name="header"></slot>
@@ -27,7 +27,6 @@
     import MessageDisplay from './MessageDisplay.vue'
     import MessageManager from './MessageManager.vue'
     import {mapMutations} from 'vuex'
-    import store from '../store'
 
     export default {
         name: 'chat',
@@ -192,9 +191,6 @@
             chatTitle() {
                 this.setChatTitle(this.chatTitle);
             }
-        },
-        beforeCreate() {
-            this.$store = store();
         },
         created() {
             this.setParticipants(this.participants);
