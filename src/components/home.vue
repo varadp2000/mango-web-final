@@ -363,11 +363,15 @@
                         [receiverKey_lastMessage]: text,
                         [receiverKey_lastTimeStamp]: date.toString(),
                     };
-                    this.updateLastSettings(obj);
+                    this.updateLastSettings(obj, 0);
                 }, 2000);
             },
             updateLastSettings(object, key) {
-                db.ref(`messages/${key}`).update(object);
+                if (key === 0) {
+                    db.ref(`messages/${this.id}`).update(object);
+                } else {
+                    db.ref(`messages/${key}`).update(object);
+                }
             },
             onClose(param) {
                 console.log(param)
@@ -405,7 +409,7 @@
                                 [receiverKey_lastMessage]: file.name,
                                 [receiverKey_lastTimeStamp]: date.toString(),
                             };
-                            this.updateLastSettings(obj);
+                            this.updateLastSettings(obj, 0);
                         });
                     }
                 );
