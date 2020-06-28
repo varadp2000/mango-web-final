@@ -119,31 +119,6 @@
                 required: false,
                 default: true
             },
-            /* onType: {
-                type: Function,
-                required: false,
-                default: () => false
-            }, */
-            /* onMessageSubmit: {
-                type: Function,
-                required: false,
-                default: () => false
-            }, */
-            /* onClose: {
-                type: Function,
-                required: false,
-                default: () => false
-            }, */
-            /* onImageSelected: {
-                type: Function,
-                required: false,
-                default: () => false
-            }, */
-            /* onImageClicked: {
-                type: Function,
-                required: false,
-                default: () => false
-            }, */
             sendImages: {
                 type: Boolean,
                 required: false,
