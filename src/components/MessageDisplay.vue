@@ -15,7 +15,7 @@
     >
       <v-checkbox v-show="showForwardBox" v-model="selected" :value="message" />
       <div
-        v-long-press="300"
+        v-long-press="500"
         @long-press-stop="showCheckBox"
         v-if="message.myself"
       >
@@ -28,7 +28,7 @@
           @onImageClicked="onImageClicked"
         />
       </div>
-      <div v-else v-long-press="300" @long-press-stop="showCheckBox">
+      <div v-else v-long-press="500" @long-press-stop="showCheckBox">
         <OtherMessage
           :message="message"
           :async-mode="asyncMode"
@@ -47,7 +47,6 @@ import { mapGetters, mapMutations } from "vuex";
 import { DateTime } from "luxon";
 import MyMessage from "./MyMessage.vue";
 import OtherMessage from "./OtherMessage.vue";
-import LongPress from "vue-directive-long-press";
 
 export default {
   components: {
@@ -74,96 +73,104 @@ export default {
                 required: false,
                 default: null
             }, */
-            scrollBottom: {
-                type: Object,
-                required: true
-            },
-            profilePictureConfig: {
-                type: Object,
-                required: true
-            },
-            timestampConfig: {
-                type: Object,
-                required: true
-            }
-        },
-        data() {
-            return {
-                updateScroll: true,
-                lastMessage: null,
-                loading: false,
-                selected: []
-            }
-        },
-        computed: {
-            ...mapGetters([
-                'getParticipantById',
-                'messages',
-                'myself'
-            ]),
-            checkedMsg() {
-                return this.selected
-            }
-        },
-        watch: {
-            selected: function (newVal, oldVal) {
-                if(this.checkedMsg === null){
-                    this.selected = [];
-                }
-                if (this.checkedMsg.length > 0) {
-                    this.selectMessage(this.checkedMsg);
-                }
-            },
-        },
-        beforeCreate() {
-            this.selected = [];
-        },
-        beforeMount() {
-            this.selected = [];
-        },
-        mounted() {
-            this.goToBottom();
-            this.$refs.containerMessageDisplay.dispatchEvent(new CustomEvent('scroll'));
-        },
-        updated() {
-            if (this.messages.length && !this.messageCompare(this.messages[this.messages.length - 1], this.lastMessage)) {
-
-                if (this.updateScroll || (this.scrollBottom.messageSent && this.messages[this.messages.length - 1].participantId == this.myself.id) || (this.scrollBottom.messageReceived && this.messages[this.messages.length - 1].participantId != this.myself.id)) {
-                    this.goToBottom();
-                    if (this.messages.length) {
-                        this.lastMessage = this.messages[this.messages.length - 1]
-                    }
-                }
-            }
-        },
-        methods: {
-            ...mapMutations([
-                'setMessages',
-                'setSelectedMessage',
-            ]),
-            selectMessage(value) {
-                this.setSelectedMessage(value);
-            },
-            /**
-             * This function compare two messages without looking at the uploaded propertie.
-             * This function has been implemented to prevent chat scrolling down after changing the message from 'uploaded = false' to 'uploaded = true'.
-             * @param {Object} message1 the first message object
-             * @param {Object} message2 the second message object
-             * @return {Boolean} true if the messages are equal and false if they are different
-             */
-            messageCompare(message1, message2) {
-                /**
-                 * if one of the messages are null, you can safely compare the messages with '==='
-                 */
-                if (!message2 || !message1) {
-                    return message1 === message2
-                }
-                /**
-                 * compare the immutable properties of a message
-                 */
-                let participant_equal = message1.participantId == message2.participantId;
-                let content_equal = message1.content == message2.content;
-                let timestamp_equal = message1.timestamp.valueOf() === message2.timestamp.valueOf();
+    scrollBottom: {
+      type: Object,
+      required: true,
+    },
+    profilePictureConfig: {
+      type: Object,
+      required: true,
+    },
+    timestampConfig: {
+      type: Object,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      updateScroll: true,
+      lastMessage: null,
+      loading: false,
+      selected: [],
+      showForwardBox: false,
+    };
+  },
+  computed: {
+    ...mapGetters(["getParticipantById", "messages", "myself"]),
+    checkedMsg() {
+      return this.selected;
+    },
+  },
+  watch: {
+    selected: function(newVal, oldVal) {
+      if (this.checkedMsg === null) {
+        this.selected = [];
+      }
+      if (this.checkedMsg.length > 0) {
+        this.selectMessage(this.checkedMsg);
+      }
+    },
+  },
+  beforeCreate() {
+    this.selected = [];
+  },
+  beforeMount() {
+    this.selected = [];
+  },
+  mounted() {
+    this.goToBottom();
+    this.$refs.containerMessageDisplay.dispatchEvent(new CustomEvent("scroll"));
+  },
+  updated() {
+    if (
+      this.messages.length &&
+      !this.messageCompare(
+        this.messages[this.messages.length - 1],
+        this.lastMessage
+      )
+    ) {
+      if (
+        this.updateScroll ||
+        (this.scrollBottom.messageSent &&
+          this.messages[this.messages.length - 1].participantId ==
+            this.myself.id) ||
+        (this.scrollBottom.messageReceived &&
+          this.messages[this.messages.length - 1].participantId !=
+            this.myself.id)
+      ) {
+        this.goToBottom();
+        if (this.messages.length) {
+          this.lastMessage = this.messages[this.messages.length - 1];
+        }
+      }
+    }
+  },
+  methods: {
+    ...mapMutations(["setMessages", "setSelectedMessage"]),
+    selectMessage(value) {
+      this.setSelectedMessage(value);
+    },
+    /**
+     * This function compare two messages without looking at the uploaded propertie.
+     * This function has been implemented to prevent chat scrolling down after changing the message from 'uploaded = false' to 'uploaded = true'.
+     * @param {Object} message1 the first message object
+     * @param {Object} message2 the second message object
+     * @return {Boolean} true if the messages are equal and false if they are different
+     */
+    messageCompare(message1, message2) {
+      /**
+       * if one of the messages are null, you can safely compare the messages with '==='
+       */
+      if (!message2 || !message1) {
+        return message1 === message2;
+      }
+      /**
+       * compare the immutable properties of a message
+       */
+      let participant_equal = message1.participantId == message2.participantId;
+      let content_equal = message1.content == message2.content;
+      let timestamp_equal =
+        message1.timestamp.valueOf() === message2.timestamp.valueOf();
 
       return participant_equal && content_equal && timestamp_equal;
     },
@@ -197,7 +204,7 @@ export default {
       this.$emit("onImageClicked", message);
     },
     showCheckBox() {
-      console.log("ShowCheckBox");
+      console.log("showCheckBox");
       this.showForwardBox = !this.showForwardBox;
     },
   },
