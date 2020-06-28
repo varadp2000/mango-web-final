@@ -1,32 +1,35 @@
 <template>
   <div>
-    <v-app-bar color="primary" dark>
-      <h1>Status</h1>
-      <v-spacer />
-    </v-app-bar>
-    <div style="display:flex">
-      <v-list subheader style="width:20%">
-        <v-subheader />
-        <v-list-item
-          :key="i"
-          @click="showStatus(item.user_status)"
-          v-for="(item, i) in items"
-        >
-          <v-list-item-avatar>
-            <v-img style="border:solid;z-index:2" :src="item.avatar" />
-          </v-list-item-avatar>
-          <v-list-item-content>
-            <v-list-item-title v-text="item.title" />
-            <v-list-item-subtitle>
-              {{ item.time }}
-            </v-list-item-subtitle>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
-      <div v-show="show" style="width:80%;display:flex;margin-top:10px">
-        <status-display :list="user_status" />
-        <v-btn @click="show = false" text> X</v-btn>
+    <div>
+      <v-app-bar color="#d30303" dark>
+        <h1>Status</h1>
+        <v-spacer />
+      </v-app-bar>
+      <div style="display:flex">
+        <v-list subheader style="width:20%">
+          <v-subheader />
+          <v-list-item
+            :key="i"
+            @click="showStatus(item.user_status)"
+            v-for="(item, i) in items"
+          >
+            <v-list-item-avatar>
+              <v-img style="border:solid;z-index:2" :src="item.avatar" />
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title v-text="item.title" />
+              <v-list-item-subtitle>
+                {{ item.time }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+        <div v-show="show" style="width:80%;display:flex;margin-top:10px">
+          <status-display :list="user_status" />
+          <v-btn @click="show = false" text> X</v-btn>
+        </div>
       </div>
+      <v-divider />
     </div>
     <v-divider />
   </div>
@@ -60,10 +63,7 @@ export default {
     var temp = [];
     let bodyFormData = new FormData();
 
-    bodyFormData.set(
-      "token",
-      /* localStorage.getItem("auth_token")*/ "tLKpJGDY3cBtzj8FOWrZK7or1Fbz0Nxq2X5BzuDMg3pDiVOJGz"
-    );
+    bodyFormData.set("token", localStorage.getItem("auth_token"));
     axios
       .post(
         "http://ec2-15-236-123-137.eu-west-3.compute.amazonaws.com/api/v1/user/status/display",

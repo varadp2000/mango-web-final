@@ -112,6 +112,10 @@
                 type: Object,
                 required: true,
             },
+            senderConfig: {
+                type: Object,
+                required: true,
+            },
             showChat: {
                 type: Boolean,
                 required: false,
@@ -126,11 +130,7 @@
                 dialog: false,
                 visible: false,
                 participants: [],
-                myself: {
-                    name: '',
-                    id: 9389857956,
-                    profilePicture: 'https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg'
-                },
+                myself: {},
                 messages: [],
                 chatTitle: 'My chat title',
                 placeholder: 'Send your message',
@@ -196,14 +196,16 @@
         },
         watch: {
             selectedContact: function (newVal, oldValue) {
-                console.log(newVal);
             },
             participantConfig: function (newVal, oldVal) {
                 var tempArray = [];
                 tempArray.push(newVal);
                 this.participants = tempArray;
+            },
+            senderConfig: function (newVal, oldVal) {
+                this.myself = newVal;
                 this.visible = true;
-                console.log('Prop changed: ', newVal, ' | was: ', oldVal)
+
             },
             id: async function (newVal, oldVal) {
                 this.id = newVal;
@@ -218,33 +220,6 @@
                     this.loading = true;
                 }
             }
-            // async messages(val) {
-            //     this.loading = false;
-            //     try {
-            //         await db
-            //             .ref(`messages/90033974379389857956`)
-            //             .on("value", (snapshot) => (console.log(snapshot.val())));
-            //         //this.chat = this.messages.chat;
-            //     } catch (err) {
-            //         this.loading = false;
-            //     } finally {
-            //         this.loading = true;
-            //     }
-            // },
-            // async id(val) {
-            //     this.receiver = val.phone_number;
-            //     this.loading = false;
-            //     try {
-            //         await db
-            //             .ref(`messages/90033974379389857956`)
-            //             .on("value", (snapshot) => (console.log(snapshot.val())));
-            //         //this.chat = this.messages.chat;
-            //     } catch (err) {
-            //         this.loading = false;
-            //     } finally {
-            //         this.loading = true;
-            //     }
-            // },
         },
         beforeMount() {
             this.selectedContact = [];
@@ -261,6 +236,15 @@
                 'setSelectedMessage',
                 'setFlag'
             ]),
+            validURL(str) {
+                var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+                    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+                    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+                    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+                    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+                    '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+                return !!pattern.test(str);
+            },
             cleanChat: function (firebaseJson) {
                 let chat = firebaseJson.chat;
                 var message = [];
@@ -293,7 +277,26 @@
                             type: type
                         };
                     } else {
+                        var isStatus = false;
+                        var status_link = '';
+                        var isStatusText = true;
+                        if (chat[key].is_status !== undefined && chat[key].is_status === "1") {
+                            isStatus = true;
+                            status_link = chat[key].status_link;
+                            var pattern = new RegExp('^(https?:\\/\\/)?' + // protocol
+                                '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+                                '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+                                '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+                                '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+                                '(\\#[-a-z\\d_]*)?$', 'i'); // fragment locator
+                            if (!!pattern.test(status_link)) {
+                                isStatusText = false;
+                            }
+                        }
                         obj = {
+                            isStatus: isStatus,
+                            status_link: status_link,
+                            isStatusText: isStatusText,
                             content: chat[key].text,
                             participantId: parseInt(chat[key].sender_id),
                             timestamp: {
@@ -314,6 +317,7 @@
                     message.push(obj);
                 });
                 this.toLoad = message.slice(0, (message.length - 5));
+                console.warn(message.slice(1).slice(-5));
                 this.messages = message.slice(1).slice(-5);
             },
             // eslint-disable-next-line
