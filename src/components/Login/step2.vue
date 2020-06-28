@@ -71,7 +71,7 @@
                             if (response.data.code == 400) {
                                 alert(JSON.stringify(response.data.data.response_msg));
                             } else {
-                                var token = response.data.token;
+                                var token = response.data.data.token;
                                 this.setAuthToken({token: token});
                                 this.$store.state.e1++;
                             }
