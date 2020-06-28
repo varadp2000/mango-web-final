@@ -43,7 +43,9 @@
             <div style="width:100%">
                 <home
                         :id="key"
-                        :participant-config="participant"/>
+                        :participant-config="participant"
+                        :sender-config="senderObj"
+                />
             </div>
         </div>
         <v-dialog v-model="status" fullscreen transition="dialog-bottom-transition">
@@ -53,6 +55,25 @@
                     <v-btn text @click="status = false">X</v-btn>
                 </v-row>
                 <status/>
+            </v-card>
+        </v-dialog>
+        <v-dialog
+                persistent
+                v-model="loading"
+                width="300"
+        >
+            <v-card
+                    color="primary"
+                    dark
+            >
+                <v-card-text>
+                    Please stand by
+                    <v-progress-linear
+                            class="mb-0"
+                            color="white"
+                            indeterminate
+                    ></v-progress-linear>
+                </v-card-text>
             </v-card>
         </v-dialog>
     </v-container>
@@ -67,6 +88,8 @@
     import status from "./status";
     import statusIcon from "./statusIcon";
     import {mapGetters, mapMutations} from 'vuex';
+    import axios from "axios";
+
 
     export default {
         components: {
@@ -81,6 +104,9 @@
             showChat: false,
             participant: {},
             status: false,
+            senderName: "",
+            senderProfilePic: "",
+            senderObj: {},
         }),
         computed: {
             ...mapGetters({
@@ -92,27 +118,28 @@
                 console.log(newVal);
                 console.log(oldVal);
             },
-            // async contacts(val) {
-            //     try {
-            //         await db
-            //             .ref(`contacts/${val}`)
-            //             .on("value", (snapshot) => this.createContactsArray(snapshot.val()));
-            //     } catch (err) {
-            //         this.loading = false;
-            //     } finally {
-            //         this.loading = true;
-            //     }
-            // },
         },
         created: async function () {
-            this.fetchData();
+            this.loading = true;
+            let bodyFormData = new FormData();
+            bodyFormData.set('token', "APmxMSaYzzPUdhqu4kXn9ayuTDI4KPAjQCvKfaFmPKJoPgwbY0");
+            axios.post("http://ec2-15-236-123-137.eu-west-3.compute.amazonaws.com/api/v1/user/display_profile",
+                bodyFormData,
+                {headers: {'Content-Type': 'multipart/form-data'}})
+                .then(response => {
+                    this.senderName = response.data.data.name;
+                    this.senderProfilePic = response.data.data.image;
+                    this.fetchData();
+                })
+                .catch(error => {
+                    console.log(error);
+                })
         },
         methods: {
             ...mapMutations([
                 'setChatList'
             ]),
             async fetchData() {
-                this.loading = false;
                 try {
                     await db
                         .ref(`contacts/${this.sender}`)
@@ -125,8 +152,6 @@
                         });
                 } catch (err) {
                     this.loading = false;
-                } finally {
-                    this.loading = true;
                 }
             },
             async createContactsArray(firebaseJson) {
@@ -140,22 +165,25 @@
                     );
                     var lastMessage = await this.getLastMessage(dbContacts[key].key);
                     var getLastTime = await this.getLastTimeStamp(dbContacts[key].key);
-                    var obj = {
-                        active: true,
-                        name: dbContacts[key].name,
-                        lastMessage: lastMessage,
-                        time: getLastTime,
-                        key: dbContacts[key].key,
-                        avatar: profileUrl,
-                        phoneNumber: dbContacts[key].phone_number,
-                    };
-                    contacts.push(obj);
+                    if (lastMessage !== null || getLastTime !== null) {
+                        var obj = {
+                            active: true,
+                            name: dbContacts[key].name,
+                            lastMessage: lastMessage,
+                            time: getLastTime,
+                            key: dbContacts[key].key,
+                            avatar: profileUrl,
+                            phoneNumber: dbContacts[key].phone_number,
+                        };
+                        contacts.push(obj);
+                    }
                 }
                 contacts.sort((a, b) => (a.time < b.time ? 1 : -1));
                 for (var i in contacts) {
-                    contacts[i].time = timeAgo.format(Date.now()-(Date.now()-contacts[i].time),'time');
+                    contacts[i].time = timeAgo.format(Date.now() - (Date.now() - contacts[i].time), 'time');
                 }
                 this.setChatList(contacts);
+                this.loading = false;
                 this.contacts = contacts;
             },
             getLastMessage(key) {
@@ -193,6 +221,14 @@
                     name: this.contacts[index].name,
                     id: parseInt(this.contacts[index].phoneNumber),
                     profilePicture: this.contacts[index].avatar,
+                };
+                if (this.senderProfilePic === "") {
+                    this.senderProfilePic = "https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg"
+                }
+                this.senderObj = {
+                    name: this.senderName,
+                    id: parseInt(this.sender),
+                    profilePicture: this.senderProfilePic
                 };
                 this.key = key;
                 this.showChat = true;

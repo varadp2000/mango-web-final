@@ -84,7 +84,6 @@
         },
         watch: {
             selected: function (newVal, oldVal) {
-                console.warn(this.checkedMsg);
                 if(this.checkedMsg === null){
                     this.selected = [];
                 }

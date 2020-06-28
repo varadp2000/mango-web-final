@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-app-bar color="primary" dark>
+        <v-app-bar color="#d30303" dark>
             <h1>Status</h1>
             <v-spacer/>
         </v-app-bar>

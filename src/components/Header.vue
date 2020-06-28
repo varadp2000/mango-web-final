@@ -13,7 +13,9 @@
         <div class="header-exit">
             <slot name="close-button">
                 <a class="header-exit-button" href="#" style="float: right;"
-                   @click.prevent="onClose">✕</a>
+                   @click.prevent="onClose">
+                    <v-icon color="white" large>mdi-account-arrow-right-outline</v-icon>
+                </a>
             </slot>
         </div>
     </div>
