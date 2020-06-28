@@ -25,6 +25,7 @@
     "luxon": "^1.21.3",
     "v-emoji-picker": "^2.2.0",
     "vue": "^2.6.10",
+    "vue-directive-long-press": "^1.1.0",
     "vue-loading-button": "^0.2.0",
     "vue-material-design-icons": "^4.4.0",
     "vue-persistent-state": "^0.2.1",
