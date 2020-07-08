@@ -3,18 +3,29 @@
         <div style="display:flex">
             <div style="width:40%;">
                 <v-toolbar color="#d30303" dark>
-                    <v-app-bar-nav-icon/>
-
-                    <v-toolbar-title>New Chat</v-toolbar-title>
-
-                    <v-spacer/>
-                    <v-btn @click="status = true" text>
-                        <status-icon :size="24"/>
-                    </v-btn>
                     <v-btn icon>
+                        <v-icon>mdi-menu</v-icon>
+                    </v-btn>
+                    <v-toolbar-title v-if="!openText">New Chat</v-toolbar-title>
+                    <v-text-field
+                            hide-details
+                            single-line
+                            v-if="openText"
+                            v-model="searchName"
+                    ></v-text-field>
+                    <v-btn @click="openText=false" icon v-if="openText">
+                        <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                    <v-btn @click="openText=true" icon>
                         <v-icon>mdi-magnify</v-icon>
                     </v-btn>
-                    <v-btn @click="logout" text>Logout</v-btn>
+                    <v-btn @click="status = true" text v-if="!openText">
+                        <status-icon :size="24"/>
+                    </v-btn>
+
+                    <v-btn @click="logout" icon>
+                        <v-icon>mdi-logout</v-icon>
+                    </v-btn>
                 </v-toolbar>
                 <v-list subheader>
                     <v-subheader>Recent chat</v-subheader>
@@ -22,7 +33,7 @@
                     <v-list-item
                             :key="item.key"
                             @click="setContact(item.key, index)"
-                            v-for="(item, index) in contacts"
+                            v-for="(item, index) in filterContact"
                     >
                         <v-list-item-avatar>
                             <v-img :src="item.avatar"/>
@@ -92,8 +103,12 @@
         },
         data: () => ({
             contacts: [],
+            openText: false,
             loading: false,
             key: "",
+            searchName: "",
+            checkboxModel: false,
+            modalModel: false,
             showChat: false,
             participant: {},
             status: false,
@@ -105,6 +120,15 @@
             ...mapGetters({
                 sender: "getPhoneNumber",
             }),
+            filterContact() {
+                const self = this;
+                if (self.searchName !== '') {
+                    return self.contacts.filter(function (products) {
+                        return products.name.toLowerCase().indexOf(self.searchName.toLowerCase()) >= 0;
+                    });
+                }
+                return self.contacts;
+            },
         },
         watch: {
             chatStatus(newVal, oldVal) {
@@ -156,36 +180,41 @@
                 TimeAgo.addLocale(en);
                 const timeAgo = new TimeAgo("en-US");
                 var contacts = [];
-                var dbContacts = firebaseJson.chatContacts;
-                for (const key of Object.keys(dbContacts)) {
-                    var profileUrl = await this.getProfilePicture(
-                        dbContacts[key].phone_number
-                    );
-                    var lastMessage = await this.getLastMessage(dbContacts[key].key);
-                    var getLastTime = await this.getLastTimeStamp(dbContacts[key].key);
-                    if (lastMessage !== null || getLastTime !== null) {
-                        var obj = {
-                            active: true,
-                            name: dbContacts[key].name,
-                            lastMessage: lastMessage,
-                            time: getLastTime,
-                            key: dbContacts[key].key,
-                            avatar: profileUrl,
-                            phoneNumber: dbContacts[key].phone_number,
-                        };
-                        contacts.push(obj);
+                try {
+                    var dbContacts = firebaseJson.chatContacts;
+                    for (const key of Object.keys(dbContacts)) {
+                        var profileUrl = await this.getProfilePicture(
+                            dbContacts[key].phone_number
+                        );
+                        var lastMessage = await this.getLastMessage(dbContacts[key].key);
+                        var getLastTime = await this.getLastTimeStamp(dbContacts[key].key);
+                        if (lastMessage !== null || getLastTime !== null) {
+                            var obj = {
+                                active: true,
+                                name: dbContacts[key].name,
+                                lastMessage: lastMessage,
+                                time: getLastTime,
+                                key: dbContacts[key].key,
+                                avatar: profileUrl,
+                                phoneNumber: dbContacts[key].phone_number,
+                            };
+                            contacts.push(obj);
+                        }
                     }
+                    contacts.sort((a, b) => (a.time < b.time ? 1 : -1));
+                    for (var i in contacts) {
+                        contacts[i].time = timeAgo.format(
+                            Date.now() - (Date.now() - contacts[i].time),
+                            "time"
+                        );
+                    }
+                    this.setChatList(contacts);
+                    this.loading = false;
+                    this.contacts = contacts;
+                } catch (e) {
+                    console.log(e);
+                    this.loading = false;
                 }
-                contacts.sort((a, b) => (a.time < b.time ? 1 : -1));
-                for (var i in contacts) {
-                    contacts[i].time = timeAgo.format(
-                        Date.now() - (Date.now() - contacts[i].time),
-                        "time"
-                    );
-                }
-                this.setChatList(contacts);
-                this.loading = false;
-                this.contacts = contacts;
             },
             getLastMessage(key) {
                 var lastMessage_key = this.sender + "_last_message";
@@ -248,4 +277,6 @@
         },
     };
 </script>
-<style scoped></style>
+<style scoped>
+
+</style>

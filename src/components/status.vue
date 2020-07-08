@@ -72,26 +72,36 @@
                     var status = response.data.data.status;
                     status.forEach((i) => {
                         console.warn(i);
-                        var phone_number = i.user_details.phone_number
-                        var name = i.user_details.name || "My Status";
-                        var profile = i.user_details.profile_image;
-                        var user_status = i.my_status;
-                        var lastStatus = user_status.slice(-1).pop();
-                        if (profile === "") {
-                            profile = "https://cdn.vuetifyjs.com/images/lists/1.jpg";
+                        try {
+                            var phone_number = i.user_details.phone_number
+                            var name = i.user_details.name || "My Status";
+                            var profile = i.user_details.profile_image;
+                            var user_status = i.my_status;
+                            var lastStatus = user_status.slice(-1).pop();
+                            if (profile === "") {
+                                profile = "https://cdn.vuetifyjs.com/images/lists/1.jpg";
+                            }
+                            var obj = {
+                                phone_number: phone_number,
+                                title: name,
+                                avatar: profile,
+                                time: timeAgo.format(
+                                    Date.now() -
+                                    (Date.now() - new Date(lastStatus.created_at).getTime()),
+                                    "time"
+                                ),
+                                user_status: user_status,
+                            };
+                            temp.push(obj);
+                        } catch (e) {
+                            var obj = {
+                                phone_number: phone_number,
+                                title: name,
+                                avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
+                                time: "No Status"
+                            };
+                            temp.push(obj);
                         }
-                        var obj = {
-                            phone_number: phone_number,
-                            title: name,
-                            avatar: profile,
-                            time: timeAgo.format(
-                                Date.now() -
-                                (Date.now() - new Date(lastStatus.created_at).getTime()),
-                                "time"
-                            ),
-                            user_status: user_status,
-                        };
-                        temp.push(obj);
                     });
                     axios
                         .post(
@@ -135,10 +145,11 @@
         },
         methods: {
             showStatus(status, num) {
-                console.log(num);
-                this.show = true;
-                this.phone = num;
-                this.user_status = status;
+                if (num === "undefined") {
+                    this.show = true;
+                    this.phone = num;
+                    this.user_status = status;
+                }
             },
         },
     };

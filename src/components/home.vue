@@ -316,9 +316,7 @@
                     }
                     message.push(obj);
                 });
-                this.toLoad = message.slice(0, (message.length - 5));
-                console.warn(message.slice(1).slice(-5));
-                this.messages = message.slice(1).slice(-5);
+                this.messages = message;
             },
             // eslint-disable-next-line
             onType: function (e) {
