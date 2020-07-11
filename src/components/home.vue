@@ -29,7 +29,7 @@
                     <v-list style="background-color: #d30303">
                         <v-list-item v-for="(participant, index) in participants" :key="index" class="custom-title">
                             <v-list-item-avatar>
-                                <v-img :src="participant.profilePicture"/>
+                                <v-img :src="participant.profilePicture" @click.stop="drawer = !drawer"/>
                             </v-list-item-avatar>
 
                             <v-list-item-content>
@@ -90,6 +90,48 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-navigation-drawer
+                absolute
+                right
+                temporary
+                v-model="drawer"
+                width="40%"
+        >
+            <v-toolbar color="#d30303" dark>
+                <v-btn @click.stop="drawer = !drawer" icon>
+                    <v-icon>mdi-close</v-icon>
+                </v-btn>
+                <v-toolbar-title>Contact Info</v-toolbar-title>
+            </v-toolbar>
+            <v-divider></v-divider>
+            <div class="text-center">
+                <v-avatar
+                        class="profile"
+                        size="164"
+                >
+                    <v-img :src="participantConfig.profilePicture"></v-img>
+                </v-avatar>
+            </div>
+            <v-list two-line>
+                <v-list-item @click="">
+                    <v-list-item-icon>
+                        <v-icon color="#b91010">mdi-account</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title>{{participantConfig.name}}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+                <v-divider inset></v-divider>
+                <v-list-item @click="">
+                    <v-list-item-icon>
+                        <v-icon color="#b91010">mdi-phone</v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content>
+                        <v-list-item-title>{{participantConfig.id}}</v-list-item-title>
+                    </v-list-item-content>
+                </v-list-item>
+            </v-list>
+        </v-navigation-drawer>
     </div>
 </template>
 
@@ -126,6 +168,7 @@
         },
         data() {
             return {
+                drawer: null,
                 selectedContact: [],
                 dialog: false,
                 visible: false,
@@ -392,6 +435,7 @@
                     () => {
                         uploadValue = 100;
                         storageRef.snapshot.ref.getDownloadURL().then((url) => {
+                            console.log(url);
                             var date = new Date(message.timestamp).getTime();
                             db.ref(`messages/${this.id}/chat`).push({
                                 is_blocked: "0",
