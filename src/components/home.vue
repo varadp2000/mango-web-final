@@ -44,9 +44,8 @@
             </template>
         </Chat>
         <v-dialog
-                v-model="dialog"
                 max-width="500"
-        >
+                v-model="dialog">
             <v-card>
                 <v-card-title class="headline">Select Contact</v-card-title>
 
@@ -55,9 +54,9 @@
                         <v-subheader>Recent chat</v-subheader>
 
                         <v-list-item
-                                v-for="(item, index) in getChatList"
-                                :key="item.key">
-                            <v-checkbox v-model="selectedContact" :value="item"></v-checkbox>
+                                :key="item.key"
+                                v-for="(item, index) in getChatList">
+                            <v-checkbox :value="item" v-model="selectedContact"/>
                             <v-list-item-avatar>
                                 <v-img :src="item.avatar"/>
                             </v-list-item-avatar>
@@ -67,24 +66,23 @@
                             </v-list-item-content>
 
                             <v-list-item-icon>
-                            <span>{{new Date(parseInt(item.time)).toLocaleString("en-US", {
-                                hour: "numeric",
-                                minute: "numeric",
-                                hour12: true,
-                            })}}</span>
+                                <span>{{new Date(parseInt(item.time)).toLocaleString("en-US", {
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: true,
+                                })}}</span>
                             </v-list-item-icon>
                         </v-list-item>
                     </v-list>
                 </v-card-text>
 
                 <v-card-actions>
-                    <v-spacer></v-spacer>
+                    <v-spacer/>
 
                     <v-btn
-                            color="green darken-1"
-                            text
                             @click="forwardMessage"
-                    >
+                            color="green darken-1"
+                            text>
                         Forward
                     </v-btn>
                 </v-card-actions>
@@ -95,21 +93,19 @@
                 right
                 temporary
                 v-model="drawer"
-                width="40%"
-        >
+                width="40%">
             <v-toolbar color="#d30303" dark>
                 <v-btn @click.stop="drawer = !drawer" icon>
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
                 <v-toolbar-title>Contact Info</v-toolbar-title>
             </v-toolbar>
-            <v-divider></v-divider>
+            <v-divider/>
             <div class="text-center">
                 <v-avatar
                         class="profile"
-                        size="164"
-                >
-                    <v-img :src="participantConfig.profilePicture"></v-img>
+                        size="164">
+                    <v-img :src="participantConfig.profilePicture"/>
                 </v-avatar>
             </div>
             <v-list two-line>
@@ -121,7 +117,7 @@
                         <v-list-item-title>{{participantConfig.name}}</v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
-                <v-divider inset></v-divider>
+                <v-divider inset/>
                 <v-list-item @click="">
                     <v-list-item-icon>
                         <v-icon color="#b91010">mdi-phone</v-icon>
@@ -476,28 +472,55 @@
                 console.warn(this.getSelectedMessages);
                 this.selectedContact.forEach(contact => {
                     this.getSelectedMessages.forEach(message => {
-                        setTimeout(() => {
-                            var text = message.content;
-                            var date = new Date().getTime();
-                            text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
-                            db.ref(`messages/${contact.key}/chat`).push({
-                                is_blocked: "0",
-                                sender_id: this.myself.id.toString(),
-                                text: text,
-                                time_stamp: date.toString(),
-                            });
-                            let senderKey_lastMessage = this.myself.id + "_last_message";
-                            let senderKey_lastTimeStamp = this.myself.id + "_last_time_stamp";
-                            let receiverKey_lastMessage = contact.phoneNumber + "_last_message";
-                            let receiverKey_lastTimeStamp = contact.phoneNumber + "_last_time_stamp";
-                            var obj = {
-                                [senderKey_lastMessage]: text,
-                                [senderKey_lastTimeStamp]: date.toString(),
-                                [receiverKey_lastMessage]: text,
-                                [receiverKey_lastTimeStamp]: date.toString(),
-                            };
-                            this.updateLastSettings(obj, contact.key);
-                        }, 1000);
+                        if (message.type === "text") {
+                            setTimeout(() => {
+                                var text = message.content;
+                                var date = new Date().getTime();
+                                text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
+                                db.ref(`messages/${contact.key}/chat`).push({
+                                    is_blocked: "0",
+                                    sender_id: this.myself.id.toString(),
+                                    text: text,
+                                    time_stamp: date.toString(),
+                                });
+                                let senderKey_lastMessage = this.myself.id + "_last_message";
+                                let senderKey_lastTimeStamp = this.myself.id + "_last_time_stamp";
+                                let receiverKey_lastMessage = contact.phoneNumber + "_last_message";
+                                let receiverKey_lastTimeStamp = contact.phoneNumber + "_last_time_stamp";
+                                var obj = {
+                                    [senderKey_lastMessage]: text,
+                                    [senderKey_lastTimeStamp]: date.toString(),
+                                    [receiverKey_lastMessage]: text,
+                                    [receiverKey_lastTimeStamp]: date.toString(),
+                                };
+                                this.updateLastSettings(obj, contact.key);
+                            }, 1000);
+                        } else {
+                            setTimeout(() => {
+                                var text = message.content;
+                                var date = new Date().getTime();
+                                text = text.replace("\r\n", "").replace("\r", "").replace("\n", "");
+                                db.ref(`messages/${contact.key}/chat`).push({
+                                    is_blocked: "0",
+                                    sender_id: this.myself.id.toString(),
+                                    text: text,
+                                    time_stamp: date.toString(),
+                                    document_link: message.src,
+                                    type: "document",
+                                });
+                                let senderKey_lastMessage = this.myself.id + "_last_message";
+                                let senderKey_lastTimeStamp = this.myself.id + "_last_time_stamp";
+                                let receiverKey_lastMessage = contact.phoneNumber + "_last_message";
+                                let receiverKey_lastTimeStamp = contact.phoneNumber + "_last_time_stamp";
+                                var obj = {
+                                    [senderKey_lastMessage]: text,
+                                    [senderKey_lastTimeStamp]: date.toString(),
+                                    [receiverKey_lastMessage]: text,
+                                    [receiverKey_lastTimeStamp]: date.toString(),
+                                };
+                                this.updateLastSettings(obj, contact.key);
+                            }, 1000);
+                        }
                     });
                 });
                 this.dialog = false;

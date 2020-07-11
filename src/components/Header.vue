@@ -1,37 +1,32 @@
 <template>
-  <div class="header-container" :style="{ background: colors.header.bg }">
-    <slot
-      name="header"
-      :colors="colors"
-      :chatTitle="chatTitle"
-      :participants="participants"
-      :myself="myself"
-    ></slot>
-    <div v-if="!hasHeaderSlot" class="header-title">
-      <p class="header-title-text" :style="{ color: colors.header.text }">
-        {{ chatTitle }}
-      </p>
-      <p class="header-paticipants-text">
-        <span>{{ myself.name }}, </span>
-        <span v-for="(participant, index) in participants" :key="participant.id"
-          >{{ participant.name
-          }}{{ participants.length - index - 1 ? ", " : "" }}</span
-        >
-      </p>
+    <div :style="{ background: colors.header.bg }" class="header-container">
+        <slot
+                :chatTitle="chatTitle"
+                :colors="colors"
+                :myself="myself"
+                :participants="participants"
+                name="header"></slot>
+        <div class="header-title" v-if="!hasHeaderSlot">
+            <p :style="{ color: colors.header.text }" class="header-title-text">
+                {{chatTitle}}
+            </p>
+            <p class="header-paticipants-text">
+                <span>{{myself.name}}, </span>
+                <span :key="participant.id" v-for="(participant, index) in participants">{{participant.name}}{{participants.length - index - 1 ? ", " : ""}}</span>
+            </p>
+        </div>
+        <div class="header-exit">
+            <slot name="close-button">
+                <a
+                        @click.prevent="onClose"
+                        class="header-exit-button"
+                        href="#"
+                        style="float: right;">
+                    <v-icon light>fa fa-share</v-icon>
+                </a>
+            </slot>
+        </div>
     </div>
-    <div class="header-exit">
-      <slot name="close-button">
-        <a
-          class="header-exit-button"
-          href="#"
-          style="float: right;"
-          @click.prevent="onClose"
-        >
-          <v-icon light>fa fa-share</v-icon
-        ></a>
-      </slot>
-    </div>
-  </div>
 </template>
 
 <script>

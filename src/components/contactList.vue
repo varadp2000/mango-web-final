@@ -12,8 +12,7 @@
                                 hide-details
                                 single-line
                                 v-if="openText"
-                                v-model="searchName"
-                        ></v-text-field>
+                                v-model="searchName"/>
                         <v-btn @click="openText=false" icon v-if="openText">
                             <v-icon>mdi-close</v-icon>
                         </v-btn>
@@ -34,8 +33,7 @@
                         <v-list-item
                                 :key="item.key"
                                 @click="setContact(item.key, index)"
-                                v-for="(item, index) in filterContact"
-                        >
+                                v-for="(item, index) in filterContact">
                             <v-list-item-avatar>
                                 <v-img :src="item.avatar"/>
                             </v-list-item-avatar>
@@ -43,12 +41,12 @@
                             <v-list-item-content>
                                 <v-list-item-title v-text="item.name"/>
                                 <v-list-item-subtitle>
-                                    {{ item.lastMessage }}
+                                    {{item.lastMessage}}
                                 </v-list-item-subtitle>
                             </v-list-item-content>
 
                             <v-list-item-icon>
-                                <span>{{ item.time }}</span>
+                                <span>{{item.time}}</span>
                             </v-list-item-icon>
                         </v-list-item>
                     </v-list>
@@ -57,8 +55,7 @@
                     <home
                             :id="key"
                             :participant-config="participant"
-                            :sender-config="senderObj"
-                    />
+                            :sender-config="senderObj"/>
                 </div>
             </div>
             <v-dialog fullscreen transition="dialog-bottom-transition" v-model="status">
@@ -77,8 +74,7 @@
                         <v-progress-linear
                                 class="mb-0"
                                 color="white"
-                                indeterminate
-                        ></v-progress-linear>
+                                indeterminate/>
                     </v-card-text>
                 </v-card>
             </v-dialog>
@@ -86,21 +82,19 @@
                     absolute
                     temporary
                     v-model="drawer"
-                    width="40%"
-            >
+                    width="40%">
                 <v-toolbar color="#d30303" dark>
                     <v-btn @click.stop="drawer = !drawer" icon>
                         <v-icon>mdi-arrow-left</v-icon>
                     </v-btn>
                     <v-toolbar-title>Profile</v-toolbar-title>
                 </v-toolbar>
-                <v-divider></v-divider>
+                <v-divider/>
                 <div class="text-center">
                     <v-avatar
                             class="profile"
-                            size="164"
-                    >
-                        <v-img :src="senderProfilePic"></v-img>
+                            size="164">
+                        <v-img :src="senderProfilePic"/>
                     </v-avatar>
                 </div>
                 <v-list two-line>
@@ -113,15 +107,16 @@
                             <v-list-item-subtitle>{{senderName}}</v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
-                    <v-divider inset></v-divider>
+                    <v-divider inset/>
                     <v-list-item @click="">
                         <v-list-item-content>
-                            <v-list-item-subtitle>This is not your username or pin. This name will be visible to your
+                            <v-list-item-subtitle>
+                                This is not your username or pin. This name will be visible to your
                                 contacts.
                             </v-list-item-subtitle>
                         </v-list-item-content>
                     </v-list-item>
-                    <v-divider inset></v-divider>
+                    <v-divider inset/>
                     <v-list-item @click="">
                         <v-list-item-icon>
                             <v-icon color="#b91010">mdi-phone</v-icon>

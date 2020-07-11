@@ -79,7 +79,7 @@
                             var user_status = i.my_status;
                             var lastStatus = user_status.slice(-1).pop();
                             if (profile === "") {
-                                profile = "https://cdn.vuetifyjs.com/images/lists/1.jpg";
+                                profile = "https://aed.cals.arizona.edu/sites/aed.cals.arizona.edu/files/images/people/default-profile_1.png";
                             }
                             var obj = {
                                 phone_number: phone_number,
@@ -97,7 +97,7 @@
                             var obj = {
                                 phone_number: phone_number,
                                 title: name,
-                                avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
+                                avatar: "https://aed.cals.arizona.edu/sites/aed.cals.arizona.edu/files/images/people/default-profile_1.png",
                                 time: "No Status"
                             };
                             temp.push(obj);
@@ -118,7 +118,7 @@
                                 var user_status = i.user_status;
                                 var lastStatus = user_status.slice(-1).pop();
                                 if (profile === "") {
-                                    profile = "https://cdn.vuetifyjs.com/images/lists/1.jpg";
+                                    profile = "https://aed.cals.arizona.edu/sites/aed.cals.arizona.edu/files/images/people/default-profile_1.png";
                                 }
                                 var obj = {
                                     phone_number: phone_number,

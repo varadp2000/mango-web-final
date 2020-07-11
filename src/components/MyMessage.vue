@@ -1,39 +1,38 @@
 <template>
     <div class="myself-message-body">
         <div class="message-content">
-                <template v-if="message.type == 'image'">
-                    <p class="message-username-image">{{myself.name}}</p>
-                    <div v-if="message.uploaded" class="message-image">
-                        <img class="message-image-display" :src="message.src" alt="" @click="onImageClicked(message)">
-                    </div>
-                    <div v-else class="message-image">
-                        <img class="message-image-display img-overlay" :src="message.preview" alt="">
-                        <div class="img-loading"></div>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="message-text"
-                         :style="{background: colors.message.myself.bg, color: colors.message.myself.text}">
-                        <p class="message-username">{{myself.name}}</p>
-                        <span>{{message.content}}
+            <template v-if="message.type == 'image'">
+                <p class="message-username-image">{{myself.name}}</p>
+                <div class="message-image" v-if="message.uploaded">
+                    <img :src="message.src" @click="onImageClicked(message)" alt="" class="message-image-display">
+                </div>
+                <div class="message-image" v-else>
+                    <img :src="message.preview" alt="" class="message-image-display img-overlay">
+                    <div class="img-loading"></div>
+                </div>
+            </template>
+            <template v-else>
+                <div :style="{background: colors.message.myself.bg, color: colors.message.myself.text}"
+                     class="message-text">
+                    <p class="message-username">{{myself.name}}</p>
+                    <span>{{message.content}}
                         <v-btn v-if="message.src" text
                                icon color="red lighten-2"
                                :href="message.src" target="_blank">
                             <v-icon>mdi-download-circle-outline</v-icon>
                         </v-btn>
-                             <v-avatar
-                                     class="profile"
-                                     color="grey"
-                                     size="120"
-                                     tile
-                                     v-if="message.isStatus"
-                             >
-            <v-img :src="message.status_link" v-if="!message.isStatusText"></v-img>
-                             <span class="white--text headline" v-else>{{message.status_link}}</span>
-          </v-avatar>
+                        <v-avatar
+                                class="profile"
+                                color="grey"
+                                size="120"
+                                tile
+                                v-if="message.isStatus">
+                            <v-img :src="message.status_link" v-if="!message.isStatusText"/>
+                            <span class="white--text headline" v-else>{{message.status_link}}</span>
+                        </v-avatar>
                     </span>
-                    </div>
-                </template>
+                </div>
+            </template>
             <div class="message-timestamp" :style="{'justify-content': 'flex-end'}">
                 <template v-if="timestampConfig.relative">
                     {{message.timestamp.toRelative()}}
