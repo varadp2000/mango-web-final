@@ -1,86 +1,134 @@
 <template>
     <v-container class="grey lighten-5">
-        <div style="display:flex">
-            <div style="width:40%;">
+        <v-card>
+            <div style="display:flex">
+                <div style="width:40%;">
+                    <v-toolbar color="#d30303" dark>
+                        <v-btn @click.stop="drawer = !drawer" icon>
+                            <v-icon>mdi-menu</v-icon>
+                        </v-btn>
+                        <v-toolbar-title v-if="!openText">New Chat</v-toolbar-title>
+                        <v-text-field
+                                hide-details
+                                single-line
+                                v-if="openText"
+                                v-model="searchName"/>
+                        <v-btn @click="openText=false" icon v-if="openText">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>
+                        <v-btn @click="openText=true" icon>
+                            <v-icon>mdi-magnify</v-icon>
+                        </v-btn>
+                        <v-btn @click="status = true" text v-if="!openText">
+                            <status-icon :size="24"/>
+                        </v-btn>
+
+                        <v-btn @click="logout" icon>
+                            <v-icon>mdi-logout</v-icon>
+                        </v-btn>
+                    </v-toolbar>
+                    <v-list subheader>
+                        <v-subheader>Recent chat</v-subheader>
+
+                        <v-list-item
+                                :key="item.key"
+                                @click="setContact(item.key, index)"
+                                v-for="(item, index) in filterContact">
+                            <v-list-item-avatar>
+                                <v-img :src="item.avatar"/>
+                            </v-list-item-avatar>
+
+                            <v-list-item-content>
+                                <v-list-item-title v-text="item.name"/>
+                                <v-list-item-subtitle>
+                                    {{item.lastMessage}}
+                                </v-list-item-subtitle>
+                            </v-list-item-content>
+
+                            <v-list-item-icon>
+                                <span>{{item.time}}</span>
+                            </v-list-item-icon>
+                        </v-list-item>
+                    </v-list>
+                </div>
+                <div style="width:100%">
+                    <home
+                            :id="key"
+                            :participant-config="participant"
+                            :sender-config="senderObj"/>
+                </div>
+            </div>
+            <v-dialog fullscreen transition="dialog-bottom-transition" v-model="status">
+                <v-card>
+                    <v-row>
+                        <v-spacer/>
+                        <v-btn @click="status = false" text>X</v-btn>
+                    </v-row>
+                    <status/>
+                </v-card>
+            </v-dialog>
+            <v-dialog persistent v-model="loading" width="300">
+                <v-card color="primary" dark>
+                    <v-card-text>
+                        Please stand by
+                        <v-progress-linear
+                                class="mb-0"
+                                color="white"
+                                indeterminate/>
+                    </v-card-text>
+                </v-card>
+            </v-dialog>
+            <v-navigation-drawer
+                    absolute
+                    temporary
+                    v-model="drawer"
+                    width="40%">
                 <v-toolbar color="#d30303" dark>
-                    <v-btn icon>
-                        <v-icon>mdi-menu</v-icon>
+                    <v-btn @click.stop="drawer = !drawer" icon>
+                        <v-icon>mdi-arrow-left</v-icon>
                     </v-btn>
-                    <v-toolbar-title v-if="!openText">New Chat</v-toolbar-title>
-                    <v-text-field
-                            hide-details
-                            single-line
-                            v-if="openText"
-                            v-model="searchName"
-                    ></v-text-field>
-                    <v-btn @click="openText=false" icon v-if="openText">
-                        <v-icon>mdi-close</v-icon>
-                    </v-btn>
-                    <v-btn @click="openText=true" icon>
-                        <v-icon>mdi-magnify</v-icon>
-                    </v-btn>
-                    <v-btn @click="status = true" text v-if="!openText">
-                        <status-icon :size="24"/>
-                    </v-btn>
-
-                    <v-btn @click="logout" icon>
-                        <v-icon>mdi-logout</v-icon>
-                    </v-btn>
+                    <v-toolbar-title>Profile</v-toolbar-title>
                 </v-toolbar>
-                <v-list subheader>
-                    <v-subheader>Recent chat</v-subheader>
-
-                    <v-list-item
-                            :key="item.key"
-                            @click="setContact(item.key, index)"
-                            v-for="(item, index) in filterContact"
-                    >
-                        <v-list-item-avatar>
-                            <v-img :src="item.avatar"/>
-                        </v-list-item-avatar>
-
+                <v-divider/>
+                <div class="text-center">
+                    <v-avatar
+                            class="profile"
+                            size="164">
+                        <v-img :src="senderProfilePic"/>
+                    </v-avatar>
+                </div>
+                <v-list two-line>
+                    <v-list-item @click="">
+                        <v-list-item-icon>
+                            <v-icon color="#b91010">mdi-account</v-icon>
+                        </v-list-item-icon>
                         <v-list-item-content>
-                            <v-list-item-title v-text="item.name"/>
+                            <v-list-item-title>Your Name</v-list-item-title>
+                            <v-list-item-subtitle>{{senderName}}</v-list-item-subtitle>
+                        </v-list-item-content>
+                    </v-list-item>
+                    <v-divider inset/>
+                    <v-list-item @click="">
+                        <v-list-item-content>
                             <v-list-item-subtitle>
-                                {{ item.lastMessage }}
+                                This is not your username or pin. This name will be visible to your
+                                contacts.
                             </v-list-item-subtitle>
                         </v-list-item-content>
-
+                    </v-list-item>
+                    <v-divider inset/>
+                    <v-list-item @click="">
                         <v-list-item-icon>
-                            <span>{{ item.time }}</span>
+                            <v-icon color="#b91010">mdi-phone</v-icon>
                         </v-list-item-icon>
+                        <v-list-item-content>
+                            <v-list-item-title>Mobile</v-list-item-title>
+                            <v-list-item-subtitle>{{sender}}</v-list-item-subtitle>
+                        </v-list-item-content>
                     </v-list-item>
                 </v-list>
-            </div>
-            <div style="width:100%">
-                <home
-                        :id="key"
-                        :participant-config="participant"
-                        :sender-config="senderObj"
-                />
-            </div>
-        </div>
-        <v-dialog fullscreen transition="dialog-bottom-transition" v-model="status">
-            <v-card>
-                <v-row>
-                    <v-spacer/>
-                    <v-btn @click="status = false" text>X</v-btn>
-                </v-row>
-                <status/>
-            </v-card>
-        </v-dialog>
-        <v-dialog persistent v-model="loading" width="300">
-            <v-card color="primary" dark>
-                <v-card-text>
-                    Please stand by
-                    <v-progress-linear
-                            class="mb-0"
-                            color="white"
-                            indeterminate
-                    ></v-progress-linear>
-                </v-card-text>
-            </v-card>
-        </v-dialog>
+            </v-navigation-drawer>
+        </v-card>
     </v-container>
 </template>
 <script>
@@ -102,6 +150,7 @@
             statusIcon,
         },
         data: () => ({
+            drawer: null,
             contacts: [],
             openText: false,
             loading: false,
@@ -148,7 +197,11 @@
                 )
                 .then((response) => {
                     this.senderName = response.data.data.name;
-                    this.senderProfilePic = response.data.data.image;
+                    if (response.data.data.image === "") {
+                        this.senderProfilePic = "https://aed.cals.arizona.edu/sites/aed.cals.arizona.edu/files/images/people/default-profile_1.png"
+                    } else {
+                        this.senderProfilePic = response.data.data.image;
+                    }
                     var obj = {
                         name: this.senderName,
                         id: parseInt(this.sender),
@@ -254,7 +307,7 @@
                 };
                 if (this.senderProfilePic === "") {
                     this.senderProfilePic =
-                        "https://lh3.googleusercontent.com/-G1d4-a7d_TY/AAAAAAAAAAI/AAAAAAAAAAA/AAKWJJPez_wX5UCJztzEUeCxOd7HBK7-jA.CMID/s83-c/photo.jpg";
+                        "https://firebasestorage.googleapis.com/v0/b/mangoo-9d3e3.appspot.com/o/man.jpg?alt=media&token=85ad8d97-245e-4515-bb0f-6880d0f58fec";
                 }
                 this.senderObj = {
                     name: this.senderName,

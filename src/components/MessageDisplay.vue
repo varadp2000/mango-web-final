@@ -1,45 +1,40 @@
 <template>
-  <div
-    ref="containerMessageDisplay"
-    :style="{ background: colors.message.messagesDisplay.bg }"
-    class="container-message-display"
-    @scroll="updateScrollState"
-  >
-    <div v-if="loading" class="loader">
-      <div class="message-loading"></div>
-    </div>
     <div
-      v-for="(message, index) in messages"
-      :key="index"
-      class="message-container"
-    >
-      <v-checkbox v-show="showForwardBox" v-model="selected" :value="message" />
-      <div
-        v-long-press="500"
-        @long-press-stop="showCheckBox"
-        v-if="message.myself"
-      >
-        <MyMessage
-          :message="message"
-          :async-mode="asyncMode"
-          :colors="colors"
-          :profile-picture-config="profilePictureConfig"
-          :timestamp-config="timestampConfig"
-          @onImageClicked="onImageClicked"
-        />
-      </div>
-      <div v-else v-long-press="500" @long-press-stop="showCheckBox">
-        <OtherMessage
-          :message="message"
-          :async-mode="asyncMode"
-          :colors="colors"
-          :profile-picture-config="profilePictureConfig"
-          :timestamp-config="timestampConfig"
-          @onImageClicked="onImageClicked"
-        />
-      </div>
+            :style="{ background: colors.message.messagesDisplay.bg }"
+            @scroll="updateScrollState"
+            class="container-message-display"
+            ref="containerMessageDisplay">
+        <div class="loader" v-if="loading">
+            <div class="message-loading"></div>
+        </div>
+        <div
+                :key="index"
+                class="message-container"
+                v-for="(message, index) in messages">
+            <v-checkbox :value="message" v-model="selected" v-show="showForwardBox"/>
+            <div
+                    @long-press-stop="showCheckBox"
+                    v-if="message.myself"
+                    v-long-press="500">
+                <MyMessage
+                        :async-mode="asyncMode"
+                        :colors="colors"
+                        :message="message"
+                        :profile-picture-config="profilePictureConfig"
+                        :timestamp-config="timestampConfig"
+                        @onImageClicked="onImageClicked"/>
+            </div>
+            <div @long-press-stop="showCheckBox" v-else v-long-press="500">
+                <OtherMessage
+                        :async-mode="asyncMode"
+                        :colors="colors"
+                        :message="message"
+                        :profile-picture-config="profilePictureConfig"
+                        :timestamp-config="timestampConfig"
+                        @onImageClicked="onImageClicked"/>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>

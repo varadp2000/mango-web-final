@@ -1,31 +1,27 @@
 <template>
     <v-container>
         <v-carousel
-                show-arrows
-                v-model="currentIndex"
                 delimiter-icon="mdi-minus"
-        >
+                show-arrows
+                v-model="currentIndex">
             <v-carousel-item
                     :key="i"
-                    v-for="(item, i) in list"
-            >
+                    v-for="(item, i) in list">
                 <v-sheet
                         color="f44336"
                         height="100%"
-                        v-if="item.status_type ==='text' "
-                >
+                        v-if="item.status_type ==='text' ">
                     <v-row
                             align="center"
                             class="fill-height"
-                            justify="center"
-                    >
+                            justify="center">
                         <div class="display-3">{{item.status}}</div>
                     </v-row>
                 </v-sheet>
                 <v-img :src="'http://ec2-15-236-123-137.eu-west-3.compute.amazonaws.com'+item.status" aspect-ratio="1"
                        contain
                        height="100%" v-else
-                       width="100%"></v-img>
+                       width="100%"/>
             </v-carousel-item>
         </v-carousel>
         <div :style="{'border-bottom-left-radius': borderStyle.bottomLeft, 'border-bottom-right-radius': borderStyle.bottomRight, 'border-top-right-radius': borderStyle.topRight, 'border-top-left-radius': borderStyle.topLeft}"
@@ -47,7 +43,7 @@
     import db from "../firebase/firebaseInit";
 
     export default {
-        name: "statusDisplay",
+        name: "status-display",
         components: {
             MessageManager
         },

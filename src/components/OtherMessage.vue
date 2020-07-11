@@ -25,16 +25,15 @@
                                :href="message.src" target="_blank">
                             <v-icon>mdi-download-circle-outline</v-icon>
                         </v-btn>
-                         <v-avatar
-                                 class="profile"
-                                 color="grey"
-                                 size="120"
-                                 tile
-                                 v-if="message.isStatus"
-                         >
-            <v-img :src="message.status_link" v-if="!message.isStatusText"></v-img>
-                             <span class="white--text headline" v-else>{{message.status_link}}</span>
-          </v-avatar>
+                        <v-avatar
+                                class="profile"
+                                color="grey"
+                                size="120"
+                                tile
+                                v-if="message.isStatus">
+                            <v-img :src="message.status_link" v-if="!message.isStatusText"/>
+                            <span class="white--text headline" v-else>{{message.status_link}}</span>
+                        </v-avatar>
 
                     </span>
                 </div>
